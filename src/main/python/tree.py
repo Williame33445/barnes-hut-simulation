@@ -2,6 +2,11 @@ class Position:
     def __init__(self,x,y):
         self.x = x
         self.y = y
+    def translated(self,offset):
+        return Position(self.x+offset.x, self.y+offset.y)
+    def scaled(self,factor):
+        return Position(self.x*factor, self.y*factor)
+
 class Particle:
     def __init__(self,mass,pos):
         self.m = mass
@@ -61,12 +66,12 @@ class Node:
             childHalfWidth = self.halfWidth / 2.0
             """calculate the new child's midpoint by adding or subtracting the
             appropriate offsets"""
-            deltaX = [-childHalfWidth, +childHalfWidth, -childHalfWidth, +childHalfWidth]
-            deltaY = [-childHalfWidth, -childHalfWidth, +childHalfWidth, +childHalfWidth]
-            #if segement is 0 then the x coordinate will 
-            childX = deltaX[childIndex]+self.midPoint.x
-            childY = deltaY[childIndex]+self.midPoint.y
-            childMidpoint = Position(childX,childY)
+            deltaX = [-1, +1, -1, +1]
+            deltaY = [-1, -1, +1, +1]
+            #if segement is 0 then the x coordinate will
+            offset = Position(deltaX[childIndex],deltaY[childIndex]).scaled(childHalfWidth)
+                
+            childMidpoint = self.midPoint.translated(offset)
             self.children[childIndex] = Node(childMidpoint ,childHalfWidth)
             
         return self.children[childIndex]
