@@ -49,11 +49,17 @@ class Node:
     def addToCorrectChild(self,particle):
         #find quadrent that the particle should go in 
         childIndex = quadrantNumber(particle.pos,self.midPoint)
+        # Get the child
+        child = self.getOrCreateChildAt(childIndex)
+        
+        child.addParticle(particle)
+
+    def getOrCreateChildAt(self, childIndex):
         #if the child index is not occupied 
         if self.children[childIndex] == None:
             #calculate the width of the child
             childHalfWidth = self.halfWidth / 2.0
-            """calculate the new childs midpoint by adding or subtracting the
+            """calculate the new child's midpoint by adding or subtracting the
             appropriate offsets"""
             deltaX = [-childHalfWidth, +childHalfWidth, -childHalfWidth, +childHalfWidth]
             deltaY = [-childHalfWidth, -childHalfWidth, +childHalfWidth, +childHalfWidth]
@@ -63,4 +69,4 @@ class Node:
             childMidpoint = Position(childX,childY)
             self.children[childIndex] = Node(childMidpoint ,childHalfWidth)
             
-        self.children[childIndex].addParticle(particle)
+        return self.children[childIndex]
