@@ -9,7 +9,7 @@ lst = [particle(1,-3,-3),particle(1,-2,-3)]
 
 def buildTree(lst,rootNode):
     for x in range(len(lst)):
-        rootNode.insertToNode(lst[x])
+        rootNode.addParticle(lst[x])
     print(rootNode.children)
               
 rootNode = Node(Position(0,0),5)
