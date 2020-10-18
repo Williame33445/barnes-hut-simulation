@@ -12,7 +12,7 @@ def printTree(t,depth=0):
             printTree(t.children[x],depth+1)
 
 
-lst = [particle(1,-3,-3),particle(1,-2,-3)]
+lst = [particle(1.0,-3.0,-3.0),particle(1.0,-2.0,-3.0)]
 
 def buildTree(lst,rootNode):
     for x in range(len(lst)):
@@ -21,5 +21,7 @@ def buildTree(lst,rootNode):
 
 rootNode = Node(Position(0,0),5)
 buildTree(lst,rootNode)
+rootNode.findMassDistribution()
+print(rootNode.mass)
 
 #change names at some

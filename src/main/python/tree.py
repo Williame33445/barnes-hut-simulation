@@ -36,6 +36,8 @@ class Node:
         self.children = [None,None,None,None]
         #if there is only one particle in the node that particle is held here
         self.particle = None
+        self.mass = 0
+        self.centerOfMass = Position(0,0)
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
@@ -83,3 +85,15 @@ class Node:
             #define the child
             self.children[childIndex] = Node(childMidpoint ,childHalfWidth)
         return self.children[childIndex]
+
+    def findMassDistribution(self):
+        if self.particleCount == 1:
+            self.mass = self.particle.m
+            self.centerOfMass = self.particle.pos
+        else:
+            for c in self.children:
+                if c != None:
+                    c.findMassDistribution()
+                    self.mass += c.mass
+                    self.centerOfMass = self.centerOfMass.translated(c.centerOfMass.scaled(c.mass))
+            self.centerOfMass = self.centerOfMass.scaled(1.0/self.mass)
