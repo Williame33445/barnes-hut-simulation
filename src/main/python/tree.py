@@ -91,9 +91,8 @@ class Node:
             self.mass = self.particle.m
             self.centerOfMass = self.particle.pos
         else:
-            for c in self.children:
-                if c != None:
-                    c.findMassDistribution()
-                    self.mass += c.mass
-                    self.centerOfMass = self.centerOfMass.translated(c.centerOfMass.scaled(c.mass))
+            for c in filter(None, self.children):
+                c.findMassDistribution()
+                self.mass += c.mass
+                self.centerOfMass = self.centerOfMass.translated(c.centerOfMass.scaled(c.mass))
             self.centerOfMass = self.centerOfMass.scaled(1.0/self.mass)

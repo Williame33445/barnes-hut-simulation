@@ -7,9 +7,8 @@ from tree import *
 def printTree(t,depth=0):
     print(depth*" " + "center=(" + str(t.midPoint.x)+","+str(t.midPoint.y)+")" + ",halfWidth=" +
     str(t.halfWidth) + ",numberOfChildren=" + str(t.particleCount-1))
-    for x in range(t.particleCount):
-        if t.children[x] != None:
-            printTree(t.children[x],depth+1)
+    for c in filter(None,t.children):
+        printTree(c,depth+1)
 
 
 lst = [particle(1.0,-3.0,-3.0),particle(1.0,-2.0,-3.0)]
