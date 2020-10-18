@@ -22,5 +22,5 @@ rootNode = Node(Position(0,0),5)
 buildTree(lst,rootNode)
 rootNode.findMassDistribution()
 print(rootNode.mass)
-
-#change names at some
+print(str(particle(1,2,3)))
+#need to clean up

@@ -11,6 +11,9 @@ class Particle:
     def __init__(self,mass,pos):
         self.m = mass
         self.pos = pos
+    def __str__(self):
+        #allows you to define what str() does for this class
+        return ("center=(" + str(self.pos.x) + "," + str(self.pos.y) + "),mass="+ str(self.m))
 #allows you to create a particle without first having to create a position
 def particle(mass,x,y):
     return Particle(mass,Position(x,y))
@@ -35,13 +38,13 @@ class Node:
         #blank children nodes
         self.children = [None,None,None,None]
         #if there is only one particle in the node that particle is held here
-        self.particle = None
+        self.leafParticle = None
         self.mass = 0
         self.centerOfMass = Position(0,0)
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
-            self.particle = newParticle
+            self.leafParticle = newParticle
         else:
             """if there are other particles in this node then find the segmant
             that is goes in and add to node"""
@@ -49,11 +52,11 @@ class Node:
             self.addToCorrectChild(newParticle)
             """this recusively runs untill untill we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if self.particle != None:
+            if self.leafParticle != None:
                 #does the same proccess as new particle until both particles have there own node
-                self.addToCorrectChild(self.particle)
+                self.addToCorrectChild(self.leafParticle)
                 #wipe the particle as we now have multiple particles in the same node
-                self.particle = None
+                self.leafParticle = None
 
         self.particleCount += 1
 
@@ -88,8 +91,8 @@ class Node:
 
     def findMassDistribution(self):
         if self.particleCount == 1:
-            self.mass = self.particle.m
-            self.centerOfMass = self.particle.pos
+            self.mass = self.leafParticle.m
+            self.centerOfMass = self.leafParticle.pos
         else:
             for c in filter(None, self.children):
                 c.findMassDistribution()
