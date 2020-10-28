@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath("src/main/python"))
 
 from tree import *
 
+
 def printTree(t,depth=0):
     print(depth*" " + "center=(" + str(t.midPoint.x)+","+str(t.midPoint.y)+")" + ",halfWidth=" +
     str(t.halfWidth) + ",numberOfChildren=" + str(t.particleCount-1))
