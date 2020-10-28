@@ -21,6 +21,6 @@ def buildTree(lst,rootNode):
 rootNode = Node(Position(0,0),5)
 buildTree(lst,rootNode)
 rootNode.findMassDistribution()
-print(rootNode.mass)
-print(str(particle(1,2,3)))
+print(rootNode.combinedParticle)
+# print(str(particle(1,2,3)))
 #need to clean up
