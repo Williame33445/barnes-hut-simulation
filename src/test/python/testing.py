@@ -25,3 +25,9 @@ rootNode.findMassDistribution()
 print(rootNode.combinedParticle)
 # print(str(particle(1,2,3)))
 #need to clean up
+"""Next things to do:
+-  add comments
+- try and clean up more(tree and testing)
+- proper testing(take from old calculator program)
+- isLeaf function to make it cleaner(replaces self.particle count == 1)
+- rename children to sectors and write function that takes out the nones"""
