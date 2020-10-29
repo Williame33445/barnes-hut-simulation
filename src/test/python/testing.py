@@ -8,7 +8,7 @@ from tree import *
 def printTree(t,depth=0):
     print(depth*" " + "center=(" + str(t.midPoint.x)+","+str(t.midPoint.y)+")" + ",halfWidth=" +
     str(t.halfWidth) + ",numberOfChildren=" + str(t.particleCount-1))
-    for c in filter(None,t.children):
+    for c in t.children():
         printTree(c,depth+1)
 
 
@@ -23,8 +23,4 @@ rootNode = Node(Position(0,0),5)
 buildTree(lst,rootNode)
 rootNode.findMassDistribution()
 print(rootNode.combinedParticle)
-# print(str(particle(1,2,3)))
-#need to clean up
-"""Next things to do:
--  add comments
-- try and clean up more"""
+"""look at vector class with acceleration,velocity and dispalcement subclasses"""

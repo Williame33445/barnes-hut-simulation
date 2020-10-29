@@ -13,7 +13,7 @@ def quadrantNumber(cors,midpoint):
         return 2
     else:
         return 3
-        
+
 def ifLeaf(node):
     if node.particleCount == 1:
         return True
@@ -23,12 +23,14 @@ class Node:
         self.midPoint = midPoint
         self.halfWidth = halfWidth
         self.particleCount = 0
-        self.children = [None,None,None,None]
+        self.childNodes = [None,None,None,None]
         self.combinedParticle = None
     def mass(self):
         return self.combinedParticle.m
     def centreOfMass(self):
         return self.combinedParticle.pos
+    def children(self):
+        return filter(None,self.childNodes)
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
@@ -61,7 +63,7 @@ class Node:
     def getOrCreateChildAt(self, childIndex):
         #we define (0,0) at the centre of the screen
         #if the child index is not occupied
-        if self.children[childIndex] == None:
+        if self.childNodes[childIndex] == None:
             #calculate the width of the child
             childHalfWidth = self.halfWidth / 2.0
             """calculate the new child's midpoint by adding or subtracting the
@@ -74,8 +76,8 @@ class Node:
             #translate position
             childMidpoint = self.midPoint.translated(offset)
             #define the child
-            self.children[childIndex] = Node(childMidpoint ,childHalfWidth)
-        return self.children[childIndex]
+            self.childNodes[childIndex] = Node(childMidpoint ,childHalfWidth)
+        return self.childNodes[childIndex]
 
     def findMassDistribution(self):
         #if the object is a leaf then no calculations are required
@@ -83,7 +85,7 @@ class Node:
             return
         mass = 0
         centreOfMass = Position(0, 0)
-        for c in filter(None, self.children):
+        for c in self.children():
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
             mass += c.mass()
@@ -98,6 +100,6 @@ class Node:
         if isLeaf(self) or (d/r < theta):
             force = calculateGravitationalForce(self.combinedParticle,targetParticle)
         else:
-            for c in filter(None,self.children):
+            for c in self.children():
                 force += c.calculateForce(targetParticle)#
         return force
