@@ -1,5 +1,7 @@
 from calculations import *
+global theta
 theta = 5
+
 """function that finds out what segment cors is in
 0 - top left, 1 - top right, 2 bottom left, 3 - bottom right"""
 def quadrantNumber(cors,midpoint):
@@ -11,6 +13,7 @@ def quadrantNumber(cors,midpoint):
         return 2
     else:
         return 3
+        
 def ifLeaf(node):
     if node.particleCount == 1:
         return True
@@ -20,9 +23,7 @@ class Node:
         self.midPoint = midPoint
         self.halfWidth = halfWidth
         self.particleCount = 0
-        """calll children sectors and write function that takes out the nones"""
         self.children = [None,None,None,None]
-        #if there is only one particle in the node that particle is held here
         self.combinedParticle = None
     def mass(self):
         return self.combinedParticle.m
@@ -39,8 +40,8 @@ class Node:
             self.addToCorrectChild(newParticle)
             """this recusively runs until we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if isLeaf(self):
-                #does the same proccess for the existing particle until both particles have there own node
+            if ifLeaf(self):
+                #does the same proccess for the existing particle until both particles have their own node
                 self.addToCorrectChild(self.combinedParticle)
                 #wipe the particle as we now have multiple particles in the same node
                 self.combinedParticle = None
@@ -77,11 +78,13 @@ class Node:
         return self.children[childIndex]
 
     def findMassDistribution(self):
+        #if the object is a leaf then no calculations are required
         if ifLeaf(self):
             return
         mass = 0
         centreOfMass = Position(0, 0)
         for c in filter(None, self.children):
+            #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
             mass += c.mass()
             centreOfMass = centreOfMass.translated(c.centreOfMass().scaled(c.mass()))
@@ -92,7 +95,7 @@ class Node:
         force = None
         r = self.centreOfMass().findDistance(targetParticle)
         d = self.halfWidth * 2
-        if (isLeaf(self)) or (d/r < theta):
+        if isLeaf(self) or (d/r < theta):
             force = calculateGravitationalForce(self.combinedParticle,targetParticle)
         else:
             for c in filter(None,self.children):

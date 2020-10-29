@@ -1,7 +1,10 @@
+global g
+g = 6.67*10**-11
+
 def calculateGravitationalForce(particle1,particle2):
     #we are assuming that the force is being calculated from particle1
     r = particle1.pos.findDistance(particle2)
-    magnitude = (6.67*10**-11)*(particle1.mass)*(particle2.mass)/(r**3)
+    magnitude = (G)*(particle1.mass)*(particle2.mass)/(r**3)
     #gives vector in the direction of the
     direction = particle2.pos.translate(particle1.pos.scaled(-1))
     return direction.translate(magnitude)

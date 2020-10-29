@@ -27,6 +27,4 @@ print(rootNode.combinedParticle)
 #need to clean up
 """Next things to do:
 -  add comments
-- try and clean up more
-- proper testing
-- rename children to sectors and write function that takes out the nones"""
+- try and clean up more"""
