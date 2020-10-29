@@ -1,7 +1,7 @@
 from calculations import *
 theta = 5
-#function that finds out what segment cors is in
-#0 - top left, 1 - top right, 2 bottom left, 3 - bottom right
+"""function that finds out what segment cors is in
+0 - top left, 1 - top right, 2 bottom left, 3 - bottom right"""
 def quadrantNumber(cors,midpoint):
     if (midpoint.x>cors.x)and(midpoint.y>cors.y):
         return 0
@@ -11,6 +11,9 @@ def quadrantNumber(cors,midpoint):
         return 2
     else:
         return 3
+def ifLeaf(node):
+    if node.particleCount == 1:
+        return True
 
 """is leaf function would make it cleaner"""
 class Node:
@@ -75,7 +78,7 @@ class Node:
         return self.children[childIndex]
 
     def findMassDistribution(self):
-        if self.particleCount == 1:
+        if ifLeaf(self):
             return
         mass = 0
         centreOfMass = Position(0, 0)
@@ -90,7 +93,7 @@ class Node:
         force = None
         r = self.centreOfMass().findDistance(targetParticle)
         d = self.halfWidth * 2
-        if (self.particleCount == 1) or (d/r < theta):
+        if (isLeaf(self)) or (d/r < theta):
             force = calculateGravitationalForce(self.combinedParticle,targetParticle)
         else:
             for c in filter(None,self.children):
