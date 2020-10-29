@@ -29,5 +29,4 @@ print(rootNode.combinedParticle)
 -  add comments
 - try and clean up more
 - proper testing
-- isLeaf function to make it cleaner(replaces )
 - rename children to sectors and write function that takes out the nones"""

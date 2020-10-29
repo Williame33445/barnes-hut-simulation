@@ -15,7 +15,6 @@ def ifLeaf(node):
     if node.particleCount == 1:
         return True
 
-"""is leaf function would make it cleaner"""
 class Node:
     def __init__(self,midPoint,halfWidth):
         self.midPoint = midPoint
@@ -40,7 +39,7 @@ class Node:
             self.addToCorrectChild(newParticle)
             """this recusively runs until we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if self.particleCount == 1:
+            if isLeaf(self):
                 #does the same proccess for the existing particle until both particles have there own node
                 self.addToCorrectChild(self.combinedParticle)
                 #wipe the particle as we now have multiple particles in the same node
