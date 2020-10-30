@@ -72,7 +72,7 @@ class Node:
             deltaX = [-1, +1, -1, +1]
             deltaY = [-1, -1, +1, +1]
             #calculate an unscaled offset and then scale it
-            offset = Position(deltaX[childIndex],deltaY[childIndex]).scaled(childHalfWidth)
+            offset = Vector(deltaX[childIndex],deltaY[childIndex]).scaled(childHalfWidth)
             childMidpoint = self.midPoint.translated(offset)
             #define the child
             self.childNodes[childIndex] = Node(childMidpoint ,childHalfWidth)
@@ -83,7 +83,7 @@ class Node:
         if ifLeaf(self):
             return
         mass = 0
-        centreOfMass = Position(0, 0)
+        centreOfMass = Vector(0, 0)
         for c in self.children():
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()

@@ -19,7 +19,7 @@ def buildTree(lst,rootNode):
         rootNode.addParticle(lst[x])
     printTree(rootNode)
 
-rootNode = Node(Position(0,0),5)
+rootNode = Node(Vector(0,0),5)
 buildTree(lst,rootNode)
 rootNode.findMassDistribution()
 print(rootNode.combinedParticle)
