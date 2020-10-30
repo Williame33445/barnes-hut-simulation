@@ -73,7 +73,6 @@ class Node:
             deltaY = [-1, -1, +1, +1]
             #calculate an unscaled offset and then scale it
             offset = Position(deltaX[childIndex],deltaY[childIndex]).scaled(childHalfWidth)
-            #translate position
             childMidpoint = self.midPoint.translated(offset)
             #define the child
             self.childNodes[childIndex] = Node(childMidpoint ,childHalfWidth)
@@ -101,5 +100,5 @@ class Node:
             force = calculateGravitationalForce(self.combinedParticle,targetParticle)
         else:
             for c in self.children():
-                force += c.calculateForce(targetParticle)#
+                force.translate(c.calculateForce(targetParticle))
         return force

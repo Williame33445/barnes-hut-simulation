@@ -7,7 +7,7 @@ def calculateGravitationalForce(particle1,particle2):
     magnitude = (G)*(particle1.mass)*(particle2.mass)/(r**3)
     #gives vector in the direction of the
     direction = particle2.pos.translate(particle1.pos.scaled(-1))
-    return direction.translate(magnitude)
+    return Force(magnitude,direction)
 
 class Position:
     def __init__(self,x,y):
@@ -30,3 +30,15 @@ class Particle:
 #allows you to create a particle without first having to create a position
 def particle(mass,x,y):
     return Particle(mass,Position(x,y))
+
+class Vector:
+    def __init__(self,magnitude,direction):
+        self.vector = direction.translate(magnitude)
+
+class Velocity(Vector):
+    def __init__(self,magnitude,direction):
+        Vector.__init__(self,magnitude,direction)
+class Force(Vector):
+    def __init__(self,magnitude,direction):
+        Vector.__init__(self,magnitude,direction)
+        #will just deduce acceleration from this
