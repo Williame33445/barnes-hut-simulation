@@ -2,16 +2,6 @@ import math
 global G
 G = 6.67*10**-11
 
-def calculateGravitationalForce(particle1,particle2):
-    #we are assuming that the force is being calculated from particle1
-    r = particle1.pos.findDistance(particle2.pos)
-    if r==0:
-        return Vector(0.0, 0.0)
-    magnitude = (G)*(particle1.mass)*(particle2.mass)/(r**3)
-    #gives vector in the direction of the
-    direction = particle2.pos.translated(particle1.pos.scaled(-1))
-    return direction.scaled(magnitude)
-
 class Vector:
     def __init__(self,x,y):
         self.x = x
@@ -30,6 +20,15 @@ class Particle:
     def __str__(self):
         #allows you to define what str() does for this class
         return ("centre=(" + str(self.pos.x) + "," + str(self.pos.y) + "),mass="+ str(self.mass))
+    def calculateAcceleration(self,particle1):
+        r = particle1.pos.findDistance(self.pos)
+        if r==0:
+            return Vector(0.0, 0.0)
+        magnitude = (G)*(particle1.mass)/(r**3)
+        #gives vector in the direction of the
+        direction = particle1.pos.translated(self.pos.scaled(-1))
+        return direction.scaled(magnitude)
+
 
 #gives the initial state of the system
 class KinematicParticle(Vector):
