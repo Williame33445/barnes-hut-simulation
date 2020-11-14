@@ -14,10 +14,6 @@ def quadrantNumber(cors,midpoint):
     else:
         return 3
 
-def isLeaf(node):
-    if node.particleCount == 1:
-        return True
-
 class Node:
     def __init__(self,midPoint,halfWidth):
         self.midPoint = midPoint
@@ -31,6 +27,9 @@ class Node:
         return self.combinedParticle.pos
     def children(self):
         return filter(None,self.childNodes)
+    def isLeaf(self):
+        if self.particleCount == 1:
+            return True
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
@@ -42,7 +41,7 @@ class Node:
             self.addToCorrectChild(newParticle)
             """this recusively runs until we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if isLeaf(self):
+            if self.isLeaf():
                 #does the same proccess for the existing particle until both particles have their own node
                 self.addToCorrectChild(self.combinedParticle)
                 #wipe the particle as we now have multiple particles in the same node
@@ -80,7 +79,7 @@ class Node:
 
     def findMassDistribution(self):
         #if the object is a leaf then no calculations are required
-        if isLeaf(self):
+        if self.isLeaf():
             return
         mass = 0
         centreOfMass = Vector(0, 0)
@@ -96,7 +95,7 @@ class Node:
         force = None
         r = self.centreOfMass().findDistance(targetParticle)
         d = self.halfWidth * 2
-        if isLeaf(self) or (d/r < theta):
+        if self.isLeaf() or (d/r < theta):
             force = calculateGravitationalForce(self.combinedParticle,targetParticle)
         else:
             for c in self.children():

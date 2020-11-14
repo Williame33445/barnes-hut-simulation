@@ -1,13 +1,13 @@
 import math 
-global g
-g = 6.67*10**-11
+global G
+G = 6.67*10**-11
 
 def calculateGravitationalForce(particle1,particle2):
     #we are assuming that the force is being calculated from particle1
     r = particle1.pos.findDistance(particle2.pos)
     if r==0:
         return Vector(0.0, 0.0)
-    magnitude = (g)*(particle1.mass)*(particle2.mass)/(r**3)
+    magnitude = (G)*(particle1.mass)*(particle2.mass)/(r**3)
     #gives vector in the direction of the
     direction = particle2.pos.translated(particle1.pos.scaled(-1))
     return direction.scaled(magnitude)
