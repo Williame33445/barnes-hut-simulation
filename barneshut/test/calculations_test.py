@@ -2,7 +2,7 @@ import unittest
 
 from barneshut.calculations import *
 
-class Gravityest(unittest.TestCase):
+class GravityTest(unittest.TestCase):
 
     def test_CalculateGravity(self):
         p00 = particle(1, 0, 0)
