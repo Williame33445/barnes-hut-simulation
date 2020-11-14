@@ -1,8 +1,8 @@
 import sys
 import os
-sys.path.append(os.path.abspath("src/main/python"))
+sys.path.append(os.path.abspath("."))
 
-from tree import *
+from barneshut.tree import *
 
 
 def printTree(t,depth=0):

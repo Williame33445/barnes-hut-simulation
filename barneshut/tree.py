@@ -1,4 +1,4 @@
-from calculations import *
+from barneshut.calculations import *
 global theta
 theta = 5
 
@@ -14,7 +14,7 @@ def quadrantNumber(cors,midpoint):
     else:
         return 3
 
-def ifLeaf(node):
+def isLeaf(node):
     if node.particleCount == 1:
         return True
 
@@ -26,7 +26,7 @@ class Node:
         self.childNodes = [None,None,None,None]
         self.combinedParticle = None
     def mass(self):
-        return self.combinedParticle.m
+        return self.combinedParticle.mass
     def centreOfMass(self):
         return self.combinedParticle.pos
     def children(self):
@@ -42,7 +42,7 @@ class Node:
             self.addToCorrectChild(newParticle)
             """this recusively runs until we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if ifLeaf(self):
+            if isLeaf(self):
                 #does the same proccess for the existing particle until both particles have their own node
                 self.addToCorrectChild(self.combinedParticle)
                 #wipe the particle as we now have multiple particles in the same node
@@ -80,7 +80,7 @@ class Node:
 
     def findMassDistribution(self):
         #if the object is a leaf then no calculations are required
-        if ifLeaf(self):
+        if isLeaf(self):
             return
         mass = 0
         centreOfMass = Vector(0, 0)
