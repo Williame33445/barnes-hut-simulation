@@ -12,6 +12,12 @@ numberOfCycles = duration/timeElapsed
 #need to change this the kinematic particle to define velocities
 initialConditions = [particle(1.0,-3.0,-3.0),particle(1.0,-2.0,-3.0),particle(4.0,-2.0,-1.0),particle(4.0,-3.0,-3.5),particle(7.0,-2.0,1.0),particle(1.0,2.0,-3.0)]
 
+def printTree(t,depth=0):
+    print(depth*" " + "center=(" + str(t.midPoint.x)+","+str(t.midPoint.y)+")" + ",halfWidth=" +
+    str(t.halfWidth) + ",numberOfChildren=" + str(t.particleCount-1))
+    for c in t.children():
+        printTree(c,depth+1)
+
 def buildTree(initialConditions,rootNode):
     for x in initialConditions:
         rootNode.addParticle(initialConditions[x])
