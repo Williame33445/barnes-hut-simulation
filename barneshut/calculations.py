@@ -39,3 +39,6 @@ class KinematicParticle(Vector):
 #allows you to create a particle without first having to create a position
 def particle(mass,x,y):
     return Particle(mass,Vector(x,y))
+
+def zeroVector():
+    return Vector(0.0, 0.0)

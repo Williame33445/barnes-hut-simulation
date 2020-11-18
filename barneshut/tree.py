@@ -82,7 +82,7 @@ class Node:
         if self.isLeaf():
             return
         mass = 0
-        centreOfMass = Vector(0, 0)
+        centreOfMass = zeroVector()
         for c in self.children():
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
@@ -91,13 +91,13 @@ class Node:
         centreOfMass = centreOfMass.scaled(1.0/mass)
         self.combinedParticle = Particle(mass, centreOfMass)
 
-    def calculateForce(self,targetParticle):
-        force = None
-        r = self.centreOfMass().findDistance(targetParticle)
+    def calculateNetAcceleration(self,targetParticle):
+        force = zeroVector()
+        r = self.centreOfMass().findDistance(targetParticle.pos)
         d = self.halfWidth * 2
         if self.isLeaf() or (d/r < theta):
-            force = calculateGravitationalForce(self.combinedParticle,targetParticle)
+            force = self.combinedParticle.calculateAcceleration(targetParticle)
         else:
             for c in self.children():
-                force.translate(c.calculateForce(targetParticle))
+                force = force.translated(c.calculateNetAcceleration(targetParticle))
         return force

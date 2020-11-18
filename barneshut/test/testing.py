@@ -18,9 +18,10 @@ def buildTree(lst,rootNode):
     for x in range(len(lst)):
         rootNode.addParticle(lst[x])
     printTree(rootNode)
-
 rootNode = Node(Vector(0,0),5)
 buildTree(lst,rootNode)
-rootNode.findMassDistribution()
-print(rootNode.combinedParticle)
+
+for x in range(2):
+    lst[x].calculateAcceleration(rootNode)
+    
 """look at vector class with acceleration,velocity and dispalcement subclasses"""
