@@ -8,6 +8,9 @@ class Vector:
         self.y = y
     def translated(self,offset):
         return Vector(self.x+offset.x, self.y+offset.y)
+    def translate(self,offset):
+        self.x += offset.x
+        self.y += offset.y
     def scaled(self,factor):
         return Vector(self.x*factor, self.y*factor)
     def findDistance(self,pos2):
@@ -31,7 +34,7 @@ class Particle:
 
 
 #gives the initial state of the system
-class KinematicParticle(Vector):
+class KinematicParticle(Particle):
     def __init__(self,mass,pos,velocity):
         Particle.__init__(self,mass,pos)
         self.velocity = velocity
