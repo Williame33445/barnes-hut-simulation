@@ -1,47 +1,65 @@
-from barneshut.calculations import *
-global theta
-theta = 5
+from abc import abstractmethod, ABC
+from barneshut.particle import *
 
-"""function that finds out what segment cors is in
-0 - top left, 1 - top right, 2 bottom left, 3 - bottom right"""
-def quadrantNumber(cors,midpoint):
-    if (midpoint.x>cors.x)and(midpoint.y>cors.y):
-        return 0
-    elif (midpoint.x<=cors.x)and(midpoint.y>cors.y):
-        return 1
-    elif (midpoint.x>cors.x)and(midpoint.y<=cors.y):
-        return 2
+def treeNode(midPoint,halfWidth,maxDepth=15,theta=0.01):
+    if maxDepth > 1:
+        return BranchingNode(midPoint,halfWidth,maxDepth,theta)
     else:
-        return 3
+        return NonBranchingNode(midPoint,halfWidth,theta)
 
-class Node:
-    def __init__(self,midPoint,halfWidth):
+class AbstractNode(ABC):
+    def __init__(self,midPoint,halfWidth,theta):
         self.midPoint = midPoint
         self.halfWidth = halfWidth
-        self.particleCount = 0
-        self.childNodes = [None,None,None,None]
+        self.theta = theta
         self.combinedParticle = None
-    def mass(self):
-        return self.combinedParticle.mass
-    def centreOfMass(self):
-        return self.combinedParticle.pos
+
+    @abstractmethod
+    def addParticle(self,newParticle):
+        pass
+
+    @abstractmethod
+    def findMassDistribution(self):
+        pass
+
+    def netAccelerationOf(self,targetParticle):
+        r = self.combinedParticle.pos.distanceTo(targetParticle.pos)
+        d = self.halfWidth * 2
+        if (d < self.theta * r):
+            return targetParticle.accelerationTowards(self.combinedParticle)
+        else:
+            return self.calculateNetAcceleration(targetParticle)
+
+    @abstractmethod
+    def calculateNetAcceleration(self,targetParticle):
+        pass
+
+    @abstractmethod
+    def structureAsString(self):
+        pass
+
+
+# A node that can create children when particles are added to it
+class BranchingNode(AbstractNode):
+    def __init__(self,midPoint,halfWidth,maxDepth,theta):
+        AbstractNode.__init__(self,midPoint,halfWidth,theta)
+        self.maxDepth = maxDepth
+        self.childNodes = [None,None,None,None]
+        self.particleCount = 0
     def children(self):
         return filter(None,self.childNodes)
-    def isLeaf(self):
-        if self.particleCount == 1:
-            return True
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
             self.combinedParticle = newParticle
         else:
             """if there are other particles in this node then find the segment
-            that the new prticle goes in and add to node"""
+            that the new particle goes in and add to node"""
             #add particle to child node
             self.addToCorrectChild(newParticle)
             """this recusively runs until we get to a leaf node(bottom node) and extends it
             until one bellow its own node"""
-            if self.isLeaf():
+            if self.combinedParticle != None:
                 #does the same proccess for the existing particle until both particles have their own node
                 self.addToCorrectChild(self.combinedParticle)
                 #wipe the particle as we now have multiple particles in the same node
@@ -51,13 +69,26 @@ class Node:
 
     def addToCorrectChild(self,particle):
         #find quadrent that the particle should go in
-        childIndex = quadrantNumber(particle.pos,self.midPoint)
+        childIndex = self.quadrantNumberFor(particle.pos)
         """if the child isn't occupied it returns none and calculates the childs midpoint and halfWidth
         otherwise it returns the values of the particles that occupy it"""
         child = self.getOrCreateChildAt(childIndex)
         """recursion then happens again and the entire proccess continues to happen until the particles
         each have there own node"""
         child.addParticle(particle)
+
+    # Function that finds out what segment position is in: 
+    #     0 - top left, 1 - top right, 2 bottom left, 3 - bottom right
+    def quadrantNumberFor(self,position):
+        midPoint = self.midPoint
+        if (midPoint.x>position.x)and(midPoint.y>position.y):
+            return 0
+        elif (midPoint.x<=position.x)and(midPoint.y>position.y):
+            return 1
+        elif (midPoint.x>position.x)and(midPoint.y<=position.y):
+            return 2
+        else:
+            return 3
 
     def getOrCreateChildAt(self, childIndex):
         #we define (0,0) at the centre of the screen
@@ -68,36 +99,71 @@ class Node:
             """calculate the new child's midpoint by adding or subtracting the
             appropriate offsets"""
             #are defined due to the way segments were defined
-            deltaX = [-1, +1, -1, +1]
-            deltaY = [-1, -1, +1, +1]
-            #calculate an unscaled offset and then scale it
-            offset = Vector(deltaX[childIndex],deltaY[childIndex]).scaled(childHalfWidth)
-            childMidpoint = self.midPoint.translated(offset)
+            deltaX = [-childHalfWidth, +childHalfWidth, -childHalfWidth, +childHalfWidth]
+            deltaY = [-childHalfWidth, -childHalfWidth, +childHalfWidth, +childHalfWidth]
+            #calculate the offset
+            offset = Vector(deltaX[childIndex],deltaY[childIndex])
+            childMidpoint = self.midPoint.plus(offset)
             #define the child
-            self.childNodes[childIndex] = Node(childMidpoint ,childHalfWidth)
+            self.childNodes[childIndex] = treeNode(childMidpoint,childHalfWidth,self.maxDepth-1,self.theta)
         return self.childNodes[childIndex]
 
     def findMassDistribution(self):
         #if the object is a leaf then no calculations are required
-        if self.isLeaf():
+        if self.combinedParticle != None:
             return
-        mass = 0
-        centreOfMass = zeroVector()
+        
         for c in self.children():
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
-            mass += c.mass()
-            centreOfMass = centreOfMass.translated(c.centreOfMass().scaled(c.mass()))
-        centreOfMass = centreOfMass.scaled(1.0/mass)
-        self.combinedParticle = Particle(mass, centreOfMass)
+            
+        childCentresOfMass = centresOfMass(self.children())
+        self.combinedParticle = combinedParticle(childCentresOfMass)
 
     def calculateNetAcceleration(self,targetParticle):
-        force = zeroVector()
-        r = self.centreOfMass().findDistance(targetParticle.pos)
-        d = self.halfWidth * 2
-        if self.isLeaf() or (d/r < theta):
-            force = self.combinedParticle.calculateAcceleration(targetParticle)
+        # If this is a leaf node (no children)..
+        if self.particleCount == 1:
+            return targetParticle.accelerationTowards(self.combinedParticle)
         else:
+            netAcceleration = zeroVector()
             for c in self.children():
-                force = force.translated(c.calculateNetAcceleration(targetParticle))
-        return force
+                # Make a mutually recursive call for each child
+                netAcceleration.translate(c.netAccelerationOf(targetParticle))
+            return netAcceleration
+
+    def structureAsString(self):
+        combinedParticleIndicator = 'o' if self.combinedParticle == None else '*'
+        childIndicators = ['' if c == None else c.structureAsString() for c in self.childNodes]
+        return f'{{{combinedParticleIndicator}[{",".join(childIndicators)}]}}'
+
+
+
+# A node will not create children when particles are added to it but will hold them in a list
+class NonBranchingNode(AbstractNode):
+    def __init__(self,midPoint,halfWidth,theta):
+        AbstractNode.__init__(self,midPoint,halfWidth,theta)
+        self.particles = []
+
+    def addParticle(self,newParticle):
+        self.particles.append(newParticle)
+
+    def findMassDistribution(self):
+        self.combinedParticle = combinedParticle(self.particles)
+
+    def calculateNetAcceleration(self,targetParticle):
+        netAcceleration = zeroVector()
+        for p in self.particles:
+            netAcceleration.translate(targetParticle.accelerationTowards(p))
+        return netAcceleration
+
+    def structureAsString(self):
+        combinedParticleIndicator = 'o' if self.combinedParticle == None else '*'
+        return f'{{{combinedParticleIndicator}{len(self.particles)}}}'
+
+
+
+def centresOfMass(nodes):
+    centres = []
+    for n in nodes:
+        centres.append(n.combinedParticle)
+    return centres
