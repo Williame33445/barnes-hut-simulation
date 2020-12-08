@@ -1,12 +1,15 @@
 from abc import abstractmethod, ABC
 from barneshut.particle import *
 
+"""if the tree increases to the max depth then the objects tree becomes a non breaching node,
+which is basically a list of the particles inside it"""
 def treeNode(midPoint,halfWidth,maxDepth=15,theta=0.01):
     if maxDepth > 1:
         return BranchingNode(midPoint,halfWidth,maxDepth,theta)
     else:
         return NonBranchingNode(midPoint,halfWidth,theta)
 
+"""the parents class that has abstract methods that need to be defined in the subclasses"""
 class AbstractNode(ABC):
     def __init__(self,midPoint,halfWidth,theta):
         self.midPoint = midPoint
@@ -21,7 +24,8 @@ class AbstractNode(ABC):
     @abstractmethod
     def findMassDistribution(self):
         pass
-
+    """finds the acceleration of the particle through recursion of calculate net acceleration until its 
+    below the theta value or a leaf node"""
     def netAccelerationOf(self,targetParticle):
         r = self.combinedParticle.pos.distanceTo(targetParticle.pos)
         d = self.halfWidth * 2
@@ -138,8 +142,10 @@ class NonBranchingNode(AbstractNode):
         self.particles.append(newParticle)
 
     def findMassDistribution(self):
+        #finds the center of mass averages the parameters for the nodes
         self.combinedParticle = combinedParticle(self.particles)
 
+    #if this gets called then its bellow the theta value and the particles are calculated exactly
     def calculateNetAcceleration(self,targetParticle):
         netAcceleration = zeroVector()
         for p in self.particles:
