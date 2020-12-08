@@ -11,7 +11,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(5.0, rootNode.halfWidth)
         self.assertEqual(0.0, rootNode.particleCount)
         # Check that there is no combinedParticle and there are no children
-        self.assertEqual("{o[,,,]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[,,,]}", rootNode)
 
 
     def test_SimpleTree(self):
@@ -21,13 +21,13 @@ class TreeTest(unittest.TestCase):
         rootNode.addParticle(p1)
         self.assertEqual(p1, rootNode.combinedParticle)
         self.assertEqual(1.0, rootNode.particleCount)
-        self.assertEqual("{*[,,,]}", rootNode.structureAsString())
+        self.checkTreeStructure("{*[,,,]}", rootNode)
 
         p2 = particle(1.0,-2.0,-3.0)
         rootNode.addParticle(p2)
         self.assertIsNone(rootNode.combinedParticle)
         self.assertEqual(2.0, rootNode.particleCount)
-        self.assertEqual("{o[{o[{*[,,,]},{*[,,,]},,]},,,]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[{o[{*[,,,]},{*[,,,]},,]},,,]}", rootNode)
 
         topLeftChild = rootNode.childNodes[0]
         self.assertIsNotNone(topLeftChild)
@@ -60,11 +60,11 @@ class TreeTest(unittest.TestCase):
         p1 = particle(1.0,-2.0,-3.0)
         rootNode.addParticle(p1)
         rootNode.addParticle(p1)
-        self.assertEqual("{o[{o[,{o2},,]},,,]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[{o[,{o2},,]},,,]}", rootNode)
 
     def test_findMassDistribution_Branching(self):
         rootNode = newTestTreeWithTwoParticles(maxDepth=5)
-        self.assertEqual("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode)
 
         self.assertIsNone(rootNode.combinedParticle)
         rootNode.findMassDistribution()
@@ -72,7 +72,7 @@ class TreeTest(unittest.TestCase):
 
     def test_findMassDistribution_NonBranching(self):
         rootNode = newTestTreeWithTwoParticles(maxDepth=1)
-        self.assertEqual("{o2}", rootNode.structureAsString())
+        self.checkTreeStructure("{o2}", rootNode)
 
         self.assertIsNone(rootNode.combinedParticle)
         rootNode.findMassDistribution()
@@ -82,24 +82,34 @@ class TreeTest(unittest.TestCase):
 
     def test_netAccelerationOf_Branching(self):
         rootNode = newTestTreeWithTwoParticles(maxDepth=5)
-        self.assertEqual("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode)
         rootNode.findMassDistribution()
         acceleration = rootNode.netAccelerationOf(ps)
         self.assertEquals(str(accelerationOfPsToP0AndP1),str(acceleration))
 
     def test_netAccelerationOf_BranchingCombined(self):
         rootNode = newTestTreeWithTwoParticles(maxDepth=5,theta=10)
-        self.assertEqual("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode.structureAsString())
+        self.checkTreeStructure("{o[,,,{o[{*[,,,]},{*[,,,]},,]}]}", rootNode)
         rootNode.findMassDistribution()
         acceleration = rootNode.netAccelerationOf(ps)
         self.assertEquals(str(accelerationOfPsToP0CombinedWithP1),str(acceleration))
 
     def test_netAccelerationOf_NonBranching(self):
         rootNode = newTestTreeWithTwoParticles(maxDepth=1)
-        self.assertEqual("{o2}", rootNode.structureAsString())
+        self.checkTreeStructure("{o2}", rootNode)
         rootNode.findMassDistribution()
         acceleration = rootNode.netAccelerationOf(ps)
         self.assertEquals(str(accelerationOfPsToP0AndP1),str(acceleration))
+
+    def checkTreeStructure(self,expected,node):
+        self.assertEquals(expected,structureAsString(node))
+
+def structureAsString(node):
+    combinedParticleIndicator = 'o' if node.combinedParticle == None else '*'
+    partcileCountIndicator = str(len(node.particles)) if hasattr(node,'particles') else ''
+    childIndicators = '[' + ','.join(['' if c == None else structureAsString(c) for c in node.childNodes]) + ']' if hasattr(node,'childNodes')  else ''
+    return f'{{{combinedParticleIndicator}{partcileCountIndicator}{childIndicators}}}'
+
 
 p0=particle(mass=1.0,x=1.0,y=2.0)
 p1=particle(mass=3.0,x=21.0,y=10.0)

@@ -40,6 +40,7 @@ class Particle:
         return direction.times(magnitude)
 
 
+#gives the initial state of the system
 class KinematicParticle(Particle):
     def __init__(self,mass,pos,velocity):
         Particle.__init__(self,mass,pos)
@@ -63,3 +64,4 @@ def combinedParticle(particles):
         centre = centre.plus(p.pos.times(p.mass))
     centre = centre.dividedBy(mass)
     return Particle(mass, centre)
+

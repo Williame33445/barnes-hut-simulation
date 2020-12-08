@@ -34,10 +34,6 @@ class AbstractNode(ABC):
     def calculateNetAcceleration(self,targetParticle):
         pass
 
-    @abstractmethod
-    def structureAsString(self):
-        pass
-
 
 # A node that can create children when particles are added to it
 class BranchingNode(AbstractNode):
@@ -117,7 +113,7 @@ class BranchingNode(AbstractNode):
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
             
-        childCentresOfMass = centresOfMass(self.children())
+        childCentresOfMass = [c.combinedParticle for c in self.children()]
         self.combinedParticle = combinedParticle(childCentresOfMass)
 
     def calculateNetAcceleration(self,targetParticle):
@@ -130,12 +126,6 @@ class BranchingNode(AbstractNode):
                 # Make a mutually recursive call for each child
                 netAcceleration.translate(c.netAccelerationOf(targetParticle))
             return netAcceleration
-
-    def structureAsString(self):
-        combinedParticleIndicator = 'o' if self.combinedParticle == None else '*'
-        childIndicators = ['' if c == None else c.structureAsString() for c in self.childNodes]
-        return f'{{{combinedParticleIndicator}[{",".join(childIndicators)}]}}'
-
 
 
 # A node will not create children when particles are added to it but will hold them in a list
@@ -155,15 +145,3 @@ class NonBranchingNode(AbstractNode):
         for p in self.particles:
             netAcceleration.translate(targetParticle.accelerationTowards(p))
         return netAcceleration
-
-    def structureAsString(self):
-        combinedParticleIndicator = 'o' if self.combinedParticle == None else '*'
-        return f'{{{combinedParticleIndicator}{len(self.particles)}}}'
-
-
-
-def centresOfMass(nodes):
-    centres = []
-    for n in nodes:
-        centres.append(n.combinedParticle)
-    return centres
