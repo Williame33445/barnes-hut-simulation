@@ -109,6 +109,11 @@ class BranchingNode(AbstractNode):
         return self.childNodes[childIndex]
 
     def findMassDistribution(self):
+        def childCentresOfMass():
+            result = []
+            for c in self.children():
+                result.append(c)
+            return result  
         #if the object is a leaf then no calculations are required
         if self.combinedParticle != None:
             return
@@ -116,9 +121,8 @@ class BranchingNode(AbstractNode):
         for c in self.children():
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
-            
-        childCentresOfMass = [c.combinedParticle for c in self.children()]
-        self.combinedParticle = combinedParticle(childCentresOfMass)
+  
+        self.combinedParticle = combinedParticle(childCentresOfMass())
 
     def calculateNetAcceleration(self,targetParticle):
         # If this is a leaf node (no children)..
