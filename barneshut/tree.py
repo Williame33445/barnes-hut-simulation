@@ -112,7 +112,7 @@ class BranchingNode(AbstractNode):
         def childCentresOfMass():
             result = []
             for c in self.children():
-                result.append(c)
+                result.append(c.combinedParticle)
             return result  
         #if the object is a leaf then no calculations are required
         if self.combinedParticle != None:

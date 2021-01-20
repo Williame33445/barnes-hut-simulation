@@ -63,13 +63,3 @@ class SimulationParams:
 
     def width(self):
         return 2.0 * self.halfWidth
-#runs the simulation for a specific period of time
-def simulate(particles,params,onTick):
-    simulator = Simulator(particles,params.halfWidth)
-
-    for t in range(params.numberOfCycles()):
-        simulator.tick(params.tickPeriod)
-
-        continueSimulation = onTick(t)
-        if not continueSimulation:
-            break
