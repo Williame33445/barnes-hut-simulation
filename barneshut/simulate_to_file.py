@@ -18,7 +18,7 @@ FPS = 24
 simulationParams = SimulationParams(halfWidth=width/2.0,tickPeriod=40.0,totalDuration=100000)
 viewParams = ViewParams(width=width,zoom=50.0,massFactor=5.0E-4)
 
-particles = [KinematicParticle(1.0E4,Vector(1.0,-3.0),Vector(5.0E-4,0.0)), KinematicParticle(1.0E4,Vector(1.0,-2.0),Vector(-5.0E-4,0.0))]
+particles = [KinematicParticle(1.0E4,Vector(1.0,-3.0),Vector(5.0E-4,0.0)),KinematicParticle(1.0E4,Vector(2.0,-1.0),Vector(5.0E-4,0.0)), KinematicParticle(1.0E4,Vector(1.0,-2.0),Vector(-5.0E-4,0.0))]
 
 viewCreator = ViewCreator(particles,viewParams)
 fourcc = VideoWriter_fourcc(*'mp4v')
