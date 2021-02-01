@@ -1,6 +1,8 @@
 from abc import abstractmethod, ABC
 import sys
 import os
+import csv
+
 
 sys.path.append(os.path.abspath("."))
 
@@ -11,6 +13,7 @@ from barneshut.simulator import *
 from barneshut.view import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
+#Abstract class whoses subclasses are the methods that the program can be run by
 class AbstractSimulationCommand(ABC):
     def __init__(self,particles,simulationParams,viewParams):
         self.particles = particles
@@ -68,7 +71,7 @@ class SimulateAndShow(AbstractSimulationCommand):
         cv2.namedWindow(self.windowName)
 
     def onTick(self):
-        frame = viewCreator.getCurrentView()
+        frame = self.viewCreator.getCurrentView()
         cv2.imshow(self.windowName, frame)
 
         k=cv2.waitKey(1)&0xFF
@@ -76,27 +79,3 @@ class SimulateAndShow(AbstractSimulationCommand):
 
     def end(self):
         cv2.destroyAllWindows()
-
-        
-
-def simFileTest():
-    fileName = 'C:\\workspace\\bh001.mp4'
-    width=10.0
-    FPS = 24
-    #sets up the initial simulation contiditions, eg how long it will run ect
-    simulationParams = SimulationParams(halfWidth=width/2.0,tickPeriod=40.0,totalDuration=100000)
-    #sets up the UI
-    viewParams = ViewParams(width=width,zoom=50.0,massFactor=5.0E-4)
-    particles = [KinematicParticle(1.0E4,Vector(1.0,-3.0),Vector(5.0E-4,0.0)),KinematicParticle(1.0E4,Vector(2.0,-1.0),Vector(5.0E-4,0.0)), KinematicParticle(1.0E4,Vector(1.0,-2.0),Vector(-5.0E-4,0.0))]
-    command = SimulateToFile(particles,simulationParams,viewParams,fileName,FPS)
-    command.execute()
-def simShowTest():
-    width=10.0
-    #sets up the initial simulation contiditions, eg how long it will run ect
-    simulationParams = SimulationParams(halfWidth=width/2.0,tickPeriod=40.0,totalDuration=100000)
-    #sets up the UI
-    viewParams = ViewParams(width=width,zoom=50.0,massFactor=5.0E-4)
-    particles = [KinematicParticle(1.0E4,Vector(1.0,-3.0),Vector(5.0E-4,0.0)),KinematicParticle(1.0E4,Vector(2.0,-1.0),Vector(5.0E-4,0.0)), KinematicParticle(1.0E4,Vector(1.0,-2.0),Vector(-5.0E-4,0.0))]
-    command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
-    command.execute()
-simFileTest()
