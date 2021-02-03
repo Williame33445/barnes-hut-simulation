@@ -4,15 +4,17 @@ from barneshut.tree import treeNode
 #Class that deals with running the simulation
 class Simulator:
 
-    def __init__(self,particles,halfWidth):
+    def __init__(self,particles,halfWidth,theta,maxDepth):
         #list of all particles 
         self.particles = particles
         #half width of the range that we are thinking about
         self.halfWidth = halfWidth
+        self.theta = theta
+        self.maxDepth = maxDepth
 
     #creates the tree
     def buildTree(self):
-        self.rootNode = treeNode(zeroVector(),self.halfWidth)
+        self.rootNode = treeNode(zeroVector(),self.halfWidth,self.maxDepth,self.theta)
         self.addParticles()
         self.rootNode.findMassDistribution()
 
@@ -52,10 +54,12 @@ class Simulator:
 
 #Class the controls how long the program runs for
 class SimulationParams:
-    def __init__(self,halfWidth,tickPeriod,totalDuration):
+    def __init__(self,halfWidth,tickPeriod,totalDuration,theta,maxDepth):
         self.halfWidth = halfWidth
         self.tickPeriod = tickPeriod
         self.totalDuration = totalDuration
+        self.theta = theta
+        self.maxDepth = maxDepth
 
     def numberOfCycles(self):
         return int(self.totalDuration/self.tickPeriod)

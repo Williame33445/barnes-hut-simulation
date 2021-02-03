@@ -20,7 +20,7 @@ class AbstractSimulationCommand(ABC):
         self.simulationParams = simulationParams
         self.viewParams = viewParams
         self.viewCreator = ViewCreator(particles,viewParams)
-        self.simulator = Simulator(particles,simulationParams.halfWidth)
+        self.simulator = Simulator(particles,simulationParams.halfWidth,simulationParams.theta,simulationParams.maxDepth)
 
     @abstractmethod
     def setUp(self):

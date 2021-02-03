@@ -10,7 +10,6 @@ from barneshut.simulator import *
 from barneshut.view import *
 
 dataLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data"
-fileName = 'C:\\workspace\\bh001.mp4'
 FPS = 24
 
 def getData(location):
@@ -23,7 +22,7 @@ def getData(location):
 
 def getSimulationParams(location,line):
     temp = getData(location)
-    return SimulationParams(float(temp[line][0]),float(temp[line][1]),float(temp[line][2]))
+    return SimulationParams(float(temp[line][0]),float(temp[line][1]),float(temp[line][2]),float(temp[line][3]),float(temp[line][4]))
 
 def getViewParams(location,line):
     temp = getData(location)
@@ -37,25 +36,23 @@ def getParticles(location):
         particles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
     return particles
 
+def getFileName(location):
+    temp = getData(location)
+    return temp[1][3]
 
 
+def barnesHutCLI(folderLocation):
+    simulationParams = getSimulationParams(folderLocation + "\\simulationParams.csv",1)
+    viewParams = getViewParams(folderLocation + "\\viewParams.csv",1)
+    particles = getParticles(folderLocation + "\\particles.csv")
+    fileName = getFileName(folderLocation + "\\viewParams.csv")
+    #if filename is 1 then the program is run atomaticaly
+    if fileName != "1":
+        command = SimulateToFile(particles,simulationParams,viewParams,folderLocation+"\\"+fileName,FPS)
+        command.execute()
+    else:
+        command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
+        command.execute()
+barnesHutCLI("C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data\\data1")
 
 
-def simulateFile(paramLine,viewLine,particleFileName):
-    #sets up the initial simulation contiditions, eg how long it will run ect
-    simulationParams = getSimulationParams(dataLocation + "\\simulationParams.csv",paramLine)
-    #sets up the UI
-    viewParams = getViewParams(dataLocation + "\\viewParams.csv",viewLine)
-    particles = getParticles(dataLocation + particleFileName)
-    command = SimulateToFile(particles,simulationParams,viewParams,fileName,FPS)
-    command.execute()
-
-def simShowTest(paramLine,viewLine,particleFileName):
-    #sets up the initial simulation contiditions, eg how long it will run ect
-    simulationParams = getSimulationParams(dataLocation + "\\simulationParams.csv",paramLine)
-    #sets up the UI
-    viewParams = getViewParams(dataLocation + "\\viewParams.csv",viewLine)
-    particles = getParticles(dataLocation + particleFileName)
-    command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
-    command.execute()
-simShowTest(1,1,"\\particles.csv")
