@@ -11,7 +11,6 @@ from barneshut.view import *
 
 dataLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data"
 fileName = 'C:\\workspace\\bh001.mp4'
-width = 10.0
 FPS = 24
 
 def getData(location):
