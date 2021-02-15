@@ -9,7 +9,6 @@ from barneshut.particle import *
 from barneshut.simulator import *
 from barneshut.view import *
 
-dataLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data"
 FPS = 24
 
 def getData(location):
@@ -36,23 +35,18 @@ def getParticles(location):
         particles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
     return particles
 
-def getFileName(location):
-    temp = getData(location)
-    return temp[1][3]
 
-
-def barnesHutCLI(folderLocation):
+#1 is simulate to file, 2 is simulate and show
+def barnesHutCLI(folderLocation,runType,fileName=""):
     simulationParams = getSimulationParams(folderLocation + "\\simulationParams.csv",1)
     viewParams = getViewParams(folderLocation + "\\viewParams.csv",1)
     particles = getParticles(folderLocation + "\\particles.csv")
-    fileName = getFileName(folderLocation + "\\viewParams.csv")
     #if filename is 1 then the program is run atomaticaly
-    if fileName != "1":
+    if runType == 1:
         command = SimulateToFile(particles,simulationParams,viewParams,folderLocation+"\\"+fileName,FPS)
         command.execute()
-    else:
+    elif runType == 2:
         command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
         command.execute()
-barnesHutCLI("C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data\\data1")
-
+#fileName needs to be MP4
 

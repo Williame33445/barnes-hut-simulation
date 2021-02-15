@@ -1,33 +1,49 @@
+import sys
+import os
 import tkinter as tk
 from tkinter import messagebox
-simulationParamsOptions = ["Half Width","Tick Period","Total Duration","Theta","Max Depth"]
-simulationParamsData = []
+from tkinter import filedialog
 
+sys.path.append(os.path.abspath("."))
+
+from barneshut.getSimulation import *
+
+simulationParamsOptions = ["Half Width","Tick Period","Total Duration","Theta","Max Depth"]
+viewParamsOptions = ["Width","Zoom","Mass Factor"]
 
 master = tk.Tk()
 master.geometry("1000x300")
 
-class Form:
-    def __init__(self,fileName,options):
+class Page:
+    def __init__(self,forms,fileName):
+        #both of them are lists 
+        self.forms = forms
         self.fileName = fileName
-        self.options = options
-        self.data = []
-    
-        
-    def runForm(self):
-        tk.Label(master,text="Simulation Parameters").grid(row=1,column=0)
-        for x in range(len(self.options)):
-            tk.Label(master,text=self.options[x]).grid(row=2,column=2*x)
-            tk.Entry(master).grid(row=2, column=2*x+1)
-            self.data.append(tk.Entry(master)) 
-            self.data[x].grid(row=2, column=2*x+1)
-        tk.Button(master,text='Save', command=self.saveToFile).place(x=10,y=45)
-        
-    def saveToFile(self):
-        file = open(self.fileName,"w")
-        for x in range(len(self.options)):
+        self.factor = len(fileName)
+
+
+    def runForms(self):
+        for x in range(len(self.fileName)):
+            self.forms[x].createForm()
+        tk.Button(master,text='Save', command=self.saveAll).place(x=10,y=50*self.factor)
+        tk.Button(master,text="Load",command=self.load).place(x=55,y=50*self.factor)
+
+    def load(self):
+        folderSelected = filedialog.askdirectory()
+        barnesHutCLI(folderSelected,runType,fileName)
+
+
+    def saveAll(self):
+        for x in range(len(self.fileName)):
+            self.saveToFile(x)
+
+
+    def saveToFile(self,t):
+        file = open(self.fileName[t],"w")
+        file.write(self.forms[t].printHeaders() + "\n")
+        for x in range(len(self.forms[t].options)):
             try:
-                intData = int(self.data[x].get().strip())
+                intData = int(self.forms[t].data[x].get().strip())
                 file.write(str(intData))
                 file.write(",")
             except:
@@ -37,9 +53,36 @@ class Form:
         file.close()
 
 
+class Form:
+    def __init__(self,options,rowFactor,formName):
+        self.options = options
+        self.rowFactor = rowFactor
+        self.data = []
+        self.formName = formName
+    
+        
+    def createForm(self):
+        tk.Label(master,text=self.formName).grid(row=1+self.rowFactor,column=0)
+        for x in range(len(self.options)):
+            tk.Label(master,text=self.options[x]).grid(row=2+self.rowFactor,column=2*x)
+            tk.Entry(master).grid(row=2+self.rowFactor, column=2*x+1)
+            self.data.append(tk.Entry(master)) 
+            self.data[x].grid(row=2+self.rowFactor, column=2*x+1)
+
+    def printHeaders(self):
+        line =  ""
+        for x in self.options:
+            line = line + x + ","
+        return line
 
 
-menu = Form("data.csv",simulationParamsOptions)
-menu.runForm()
+
+
+temp = [Form(simulationParamsOptions,0,"Simulation Parameters"),Form(viewParamsOptions,2,"View Parameters")]
+fileNames = ["simulationParams.csv","viewParams.csv"]
+var = Page(temp,fileNames)
+var.runForms()
+
+
 
 tk.mainloop()
