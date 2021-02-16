@@ -15,25 +15,38 @@ viewParamsOptions = ["Width","Zoom","Mass Factor"]
 master = tk.Tk()
 master.geometry("1000x300")
 
-#need to create an option for this
-folderLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data\\data1"
 FPS = 24
 
-def getSimulationParamsForScreen(data):
-    return SimulationParams(float(data[0].get()),float(data[1].get()),float(data[2].get()),float(data[3].get()),float(data[4].get()))
+def getSimulationParamsForScreen(form):
+    return SimulationParams(form.get(0),form.get(1),form.get(2),form.get(3),form.get(4))
 
-def getViewParamsForScreen(data):
-    return ViewParams(float(data[0].get()),float(data[1].get()),float(data[2].get()))
+def getViewParamsForScreen(form):
+    return ViewParams(form.get(0),form.get(1),form.get(2))
 
+#returns a 2d list [line number][column]
+def getData(location,line):
+    data = []
+    with open(location, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            data.append(row)
+    return data[line]
+
+def emptyTkList(length):
+    lst = []
+    for x in range(length):
+        lst.append(tk.StringVar())
+    return lst
 
 class Page:
     def __init__(self,forms,fileName):
         #both of them are lists 
         self.forms = forms
         self.fileName = fileName
-        self.factor = len(fileName)
+        self.factor = 2
         #0 is run and show, 1 in simulate to file
         self.runType = tk.IntVar()
+        self.folderLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data\\data1"
 
     def runForms(self):
         for x in range(len(self.fileName)):
@@ -44,18 +57,22 @@ class Page:
         tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=145,y=50*self.factor)
 
     def load(self):
-        pass
+        simulationParamsData = getData(self.folderLocation + "\\simulationParams.csv",1)
+        self.forms[0].setData(simulationParamsData)
+        viewParamsData = getData(self.folderLocation + "\\viewParams.csv",1)
+        self.forms[1].setData(viewParamsData)
 
     def run(self):
-        simulationParams = getSimulationParamsForScreen(self.forms[0].data)
-        viewParams = getViewParamsForScreen(self.forms[1].data)
+        simulationParams = getSimulationParamsForScreen(self.forms[0])
+        viewParams = getViewParamsForScreen(self.forms[1])
+        print(simulationParams.halfWidth)
         #need to change at some point
-        particles = getParticles(folderLocation + "\\particles.csv")
+        particles = getParticles(self.folderLocation + "\\particles.csv")
         if self.runType.get() == 0:
             command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
             command.execute()
         elif self.runType.get() == 1:
-            command = SimulateToFile(particles,simulationParams,viewParams,folderLocation+"\\data.mp4",FPS)
+            command = SimulateToFile(particles,simulationParams,viewParams,self.folderLocation+"\\data.mp4",FPS)
             command.execute()
 
     def saveAll(self):
@@ -82,24 +99,28 @@ class Form:
     def __init__(self,options,rowFactor,formName):
         self.options = options
         self.rowFactor = rowFactor
-        self.data = []
         self.formName = formName
+        self.entryText = emptyTkList(len(self.options))
     
+    def get(self, i):
+        return float(self.entryText[i].get())
         
     def createForm(self):
         tk.Label(master,text=self.formName).grid(row=1+self.rowFactor,column=0)
         for x in range(len(self.options)):
             tk.Label(master,text=self.options[x]).grid(row=2+self.rowFactor,column=2*x)
-            tk.Entry(master).grid(row=2+self.rowFactor, column=2*x+1)
-            self.data.append(tk.Entry(master)) 
-            self.data[x].grid(row=2+self.rowFactor, column=2*x+1)
+            tk.Entry(master,text=self.entryText[x]).grid(row=2+self.rowFactor, column=2*x+1)
 
     def printHeaders(self):
         line =  ""
         for x in self.options:
             line = line + x + ","
         return line
-    
+
+    def setData(self,data):
+        for x in range(len(self.options)):
+            self.entryText[x].set(float(data[x]))
+        # self.createForm()
 
 
 
