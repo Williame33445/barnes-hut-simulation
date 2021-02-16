@@ -64,8 +64,11 @@ class Page:
         self.viewParametersForm.setData(viewParamsData)
 
     def run(self):
-        simulationParams = getSimulationParamsForScreen(self.simulationParametersForm)
-        viewParams = getViewParamsForScreen(self.viewParametersForm)
+        try:
+            simulationParams = getSimulationParamsForScreen(self.simulationParametersForm)
+            viewParams = getViewParamsForScreen(self.viewParametersForm)
+        except:
+            messagebox.showerror("Error","Incorrect data given.")     
         #need to change at some point
         particles = getParticles(self.folderLocation + "\\particles.csv")
         if self.runType.get() == 0:
