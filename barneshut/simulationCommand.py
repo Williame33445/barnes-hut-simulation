@@ -31,7 +31,9 @@ class AbstractSimulationCommand(ABC):
             #applies the accelerations and the velocities to the particles
             self.simulator.tick(self.simulationParams.tickPeriod)
             #updates the video file to take into account the current frame
-            self.onTick()
+            carryOn = self.onTick()
+            if not carryOn:
+                return
 
     @abstractmethod
     def onTick(self):
@@ -57,6 +59,7 @@ class SimulateToFile(AbstractSimulationCommand):
     def onTick(self):
         frame = self.viewCreator.getCurrentView()
         self.video.write(frame)
+        return True
     def end(self):
         self.video.release()
 

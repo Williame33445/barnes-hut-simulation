@@ -70,7 +70,7 @@ class Page:
         tk.Button(master,text='Save', command=self.saveAll).place(x=10,y=50*self.factor)
         tk.Button(master,text="Load",command=self.load).place(x=55,y=50*self.factor)
         tk.Button(master,text="Run",command=self.run).place(x=100,y=50*self.factor)
-        tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=145,y=50*self.factor)
+        tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=240,y=50*self.factor)
         tk.Button(master,text="View intial state",command=self.viewParticles).place(x=145,y=50*self.factor)
 
     def viewParticles(self):
