@@ -12,7 +12,7 @@ from barneshut.view import *
 from barneshut.GUI.numericalForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-#error: The initial particles are not stored unless they are stored in main memory, so running several times means that you don't start at the intial state again.
+
 
 
 master = tk.Tk()
