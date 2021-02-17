@@ -3,11 +3,13 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
+import cv2
 
 sys.path.append(os.path.abspath("."))
 
-from barneshut.getSimulation import *
 from barneshut.simulationCommand import *
+from barneshut.view import *
+from cv2 import VideoWriter, VideoWriter_fourcc
 
 simulationParamsOptions = ["Half Width","Tick Period","Total Duration","Theta","Max Depth"]
 viewParamsOptions = ["Width","Zoom","Mass Factor"]
@@ -23,14 +25,27 @@ def getSimulationParamsForScreen(form):
 def getViewParamsForScreen(form):
     return ViewParams(form.get(0),form.get(1),form.get(2))
 
-#returns a 2d list [line number][column]
+def getParticles(location):
+    particles = getData(location,0)
+    particles.pop(0)
+    kinematicParticles = []
+    for x in particles:
+        kinematicParticles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
+    return kinematicParticles
+
+#returns a 2d list [line number][column], if line is 0 then return the all the lines
 def getData(location,line):
     data = []
     with open(location, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             data.append(row)
-    return data[line]
+    if line == 0:
+        return data
+    else:
+        return data[line]
+
+
 
 def emptyTkList(length):
     lst = []
@@ -56,6 +71,16 @@ class Page:
         tk.Button(master,text="Load",command=self.load).place(x=55,y=50*self.factor)
         tk.Button(master,text="Run",command=self.run).place(x=100,y=50*self.factor)
         tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=145,y=50*self.factor)
+        tk.Button(master,text="View intial state",command=self.viewParticles).place(x=145,y=50*self.factor)
+
+    def viewParticles(self):
+        self.getSimulationParameters()
+        viewCreator = ViewCreator(self.particles,self.viewParams)
+        windowName = "Inital State"
+        cv2.namedWindow(windowName)
+        frame = viewCreator.getCurrentView()
+        cv2.imshow(windowName,frame)
+
 
     def load(self):
         simulationParamsData = getData(self.folderLocation + "\\simulationParams.csv",1)
@@ -63,24 +88,29 @@ class Page:
         viewParamsData = getData(self.folderLocation + "\\viewParams.csv",1)
         self.viewParametersForm.setData(viewParamsData)
 
-    def run(self):
+    def getSimulationParameters(self):
         try:
-            simulationParams = getSimulationParamsForScreen(self.simulationParametersForm)
-            viewParams = getViewParamsForScreen(self.viewParametersForm)
+            self.simulationParams = getSimulationParamsForScreen(self.simulationParametersForm)
+            self.viewParams = getViewParamsForScreen(self.viewParametersForm)
+            self.particles = getParticles(self.folderLocation + "\\particles.csv")
         except:
-            messagebox.showerror("Error","Incorrect data given.")     
-        #need to change at some point
-        particles = getParticles(self.folderLocation + "\\particles.csv")
+            messagebox.showerror("Error","Incorrect data given.")    
+
+
+
+    def run(self): 
+        self.getSimulationParameters()
         if self.runType.get() == 0:
-            command = SimulateAndShow(particles,simulationParams,viewParams,'Circle')
+            command = SimulateAndShow(self.particles,self.simulationParams,self.viewParams,'Circle')
             command.execute()
         elif self.runType.get() == 1:
-            command = SimulateToFile(particles,simulationParams,viewParams,self.folderLocation+self.fileName,FPS)
+            command = SimulateToFile(self.particles,self.simulationParams,self.viewParams,self.folderLocation+self.fileName,FPS)
             command.execute()
 
     def saveAll(self):
         self.saveToFile(self.folderLocation + "\\simulationParams.csv",self.simulationParametersForm)
         self.saveToFile(self.folderLocation + "\\viewParams.csv",self.viewParametersForm)
+        #need to add particles in here at some point
 
 
     def saveToFile(file,form):
