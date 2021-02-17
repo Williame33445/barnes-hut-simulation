@@ -12,20 +12,15 @@ from barneshut.view import *
 from barneshut.GUI.numericalForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-simulationParamsOptions = ["Half Width","Tick Period","Total Duration","Theta","Max Depth"]
-viewParamsOptions = ["Width","Zoom","Mass Factor"]
+#error: The initial particles are not stored unless they are stored in main memory, so running several times means that you don't start at the intial state again, but where you left off.
+
 
 master = tk.Tk()
 master.geometry("1000x300")
 
 FPS = 24
 
-def getSimulationParamsForScreen(form):
-    return SimulationParams(form.get(0),form.get(1),form.get(2),form.get(3),form.get(4))
-
-def getViewParamsForScreen(form):
-    return ViewParams(form.get(0),form.get(1),form.get(2))
-
+#this part will be removed when load particle options are done properly
 def getParticles(location):
     particles = getData(location,0)
     particles.pop(0)
@@ -33,8 +28,6 @@ def getParticles(location):
     for x in particles:
         kinematicParticles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
     return kinematicParticles
-
-#returns a 2d list [line number][column], if line is 0 then return the all the lines
 def getData(location,line):
     data = []
     with open(location, 'r') as file:
@@ -45,8 +38,6 @@ def getData(location,line):
         return data
     else:
         return data[line]
-
-
 
 
 class Page:
@@ -63,14 +54,15 @@ class Page:
     def runForms(self):
         self.viewParametersForm.createForm()
         self.simulationParametersForm.createForm()
-        tk.Button(master,text='Save', command=self.saveAll).place(x=10,y=50*self.factor)
-        tk.Button(master,text="Load",command=self.load).place(x=55,y=50*self.factor)
-        tk.Button(master,text="Run",command=self.run).place(x=100,y=50*self.factor)
-        tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=240,y=50*self.factor)
-        tk.Button(master,text="View intial state",command=self.viewParticles).place(x=145,y=50*self.factor)
+        tk.Button(master,text='Save Parameters', command=self.saveAll).place(x=10,y=50*self.factor)
+        tk.Button(master,text="Load Parameters",command=self.load).place(x=115,y=50*self.factor)
+        tk.Button(master,text="Run",command=self.run).place(x=10,y=80+50*self.factor)
+        tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=50,y=80+50*self.factor)
+        tk.Button(master,text="Load Particles and Preview",command=self.viewParticles).place(x=10,y=40+50*self.factor)
 
     def viewParticles(self):
-        self.getSimulationParameters()
+        self.getAllParameters()
+        self.getParticles()
         viewCreator = ViewCreator(self.particles,self.viewParams)
         windowName = "Inital State"
         cv2.namedWindow(windowName)
@@ -79,23 +71,21 @@ class Page:
 
 
     def load(self):
-        simulationParamsData = getData(self.folderLocation + "\\simulationParams.csv",1)
-        self.simulationParametersForm.setData(simulationParamsData)
-        viewParamsData = getData(self.folderLocation + "\\viewParams.csv",1)
-        self.viewParametersForm.setData(viewParamsData)
+        self.simulationParametersForm.loadFromFile(self.folderLocation)
+        self.viewParametersForm.loadFromFile(self.folderLocation)
 
-    def getSimulationParameters(self):
-        try:
-            self.simulationParams = getSimulationParamsForScreen(self.simulationParametersForm)
-            self.viewParams = getViewParamsForScreen(self.viewParametersForm)
-            self.particles = getParticles(self.folderLocation + "\\particles.csv")
-        except:
-            messagebox.showerror("Error","Incorrect data given.")    
+    def getAllParameters(self):
+        #put errors in here eventually 
+        self.simulationParams = self.simulationParametersForm.getParams()
+        self.viewParams = self.viewParametersForm.getParams()
+        
 
-
+    def getParticles(self):
+        self.particles = getParticles(self.folderLocation + "\\particles.csv")   
 
     def run(self): 
-        self.getSimulationParameters()
+        self.getAllParameters()
+        self.getParticles
         if self.runType.get() == 0:
             command = SimulateAndShow(self.particles,self.simulationParams,self.viewParams,'Circle')
             command.execute()
@@ -104,30 +94,15 @@ class Page:
             command.execute()
 
     def saveAll(self):
-        self.saveToFile(self.folderLocation + "\\simulationParams.csv",self.simulationParametersForm)
-        self.saveToFile(self.folderLocation + "\\viewParams.csv",self.viewParametersForm)
+        self.simulationParametersForm.saveSimulationToFile(self.folderLocation)
+        self.viewParametersForm.saveSimulationToFile(self.folderLocation)
         #need to add particles in here at some point
 
 
-    def saveToFile(file,form):
-        file = open(file,"w")
-        file.write(form.printHeaders() + "\n")
-        for x in range(len(form.options)):
-            try:
-                intData = int(form.data[x].get().strip())
-                file.write(str(intData))
-                file.write(",")
-            except:
-                messagebox.showerror("Error","Incorrect data.")
-                file.close()
-                break
-        file.close()
 
-
-
-
-temp = [NumericalForm(simulationParamsOptions,0,"Simulation Parameters",master),NumericalForm(viewParamsOptions,2,"View Parameters",master)]
-var = Page(temp[1],temp[0])
+temp1 = SimulationParametersForm(0,master)
+temp2 = ViewParametersForm(2,master)
+var = Page(temp2,temp1)
 var.runForms()
 
 

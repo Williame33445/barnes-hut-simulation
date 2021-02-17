@@ -1,2 +1,2 @@
-halfWidth,tickPeriod,totalDuration,theta,maxDepth
-5.0,40.0,100000,.01,15
+Half Width,Tick Period,Total Duration,Theta,Max Depth,
+5.0,40.0,100000.0,0.01,15.0,
