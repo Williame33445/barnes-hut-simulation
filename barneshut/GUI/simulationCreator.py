@@ -9,6 +9,7 @@ sys.path.append(os.path.abspath("."))
 
 from barneshut.simulationCommand import *
 from barneshut.view import *
+from barneshut.GUI.numericalForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
 simulationParamsOptions = ["Half Width","Tick Period","Total Duration","Theta","Max Depth"]
@@ -47,11 +48,6 @@ def getData(location,line):
 
 
 
-def emptyTkList(length):
-    lst = []
-    for x in range(length):
-        lst.append(tk.StringVar())
-    return lst
 
 class Page:
     def __init__(self,viewParametersForm,simulationParametersForm):
@@ -128,36 +124,9 @@ class Page:
         file.close()
 
 
-class Form:
-    def __init__(self,options,rowFactor,formName):
-        self.options = options
-        self.rowFactor = rowFactor
-        self.formName = formName
-        self.entryText = emptyTkList(len(self.options))
-    
-    def get(self, i):
-        return float(self.entryText[i].get())
-        
-    def createForm(self):
-        tk.Label(master,text=self.formName).grid(row=1+self.rowFactor,column=0)
-        for x in range(len(self.options)):
-            tk.Label(master,text=self.options[x]).grid(row=2+self.rowFactor,column=2*x)
-            tk.Entry(master,text=self.entryText[x]).grid(row=2+self.rowFactor, column=2*x+1)
-
-    def printHeaders(self):
-        line =  ""
-        for x in self.options:
-            line = line + x + ","
-        return line
-
-    def setData(self,data):
-        for x in range(len(self.options)):
-            self.entryText[x].set(float(data[x]))
-        # self.createForm()
 
 
-
-temp = [Form(simulationParamsOptions,0,"Simulation Parameters"),Form(viewParamsOptions,2,"View Parameters")]
+temp = [NumericalForm(simulationParamsOptions,0,"Simulation Parameters",master),NumericalForm(viewParamsOptions,2,"View Parameters",master)]
 var = Page(temp[1],temp[0])
 var.runForms()
 

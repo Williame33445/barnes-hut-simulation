@@ -1,0 +1,5 @@
+
+- selecting a working folder 
+- progress bar when saving to file
+- arrow or velocity indication on preview
+
