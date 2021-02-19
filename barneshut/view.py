@@ -31,6 +31,6 @@ class ViewCreator:
     def getCurrentView(self):
         frame = np.full(self.params.frameShape, self.params.backgroundValue, dtype=np.uint8)
         for p in self.particles:
-            cv2.circle(frame, self.params.scaledPos(p), self.params.scaledMass(p), self.params.particleColour, self.params.markerThickness)
+            cv2.circle(frame, self.params.scaledPos(p), 2, self.params.particleColour, self.params.markerThickness)
 
         return frame
