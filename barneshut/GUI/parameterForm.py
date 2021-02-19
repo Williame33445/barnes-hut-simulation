@@ -6,7 +6,9 @@ from tkinter.constants import LEFT
 
 sys.path.append(os.path.abspath("."))
 
-from barneshut.simulationCommand import *
+from barneshut.view import *
+
+from barneshut.simulator import *
 
 BG='#EEEEEE'
 

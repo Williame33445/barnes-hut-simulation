@@ -1,6 +1,10 @@
-
+- Some way(s) to generate initial state
 - selecting a working folder 
-- progress bar when saving to file
-- arrow or velocity indication on preview
 - error handling
-- fix error: The initial particles are not stored in the class, so if you run several times you don't start at the intial state.
+
+
+
+Future enhancements
+- Ability to label particles
+- arrow or velocity indication on preview
+- display particle in form instead of pop-up?????

@@ -3,7 +3,6 @@ import sys
 import os
 import csv
 
-
 sys.path.append(os.path.abspath("."))
 
 import cv2
@@ -13,18 +12,33 @@ from barneshut.simulator import *
 from barneshut.view import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
+class SimulationListener(ABC):
+
+    @abstractmethod
+    def setUp(self):
+        pass
+
+    @abstractmethod
+    def onTick(self,currentView):
+        pass
+
+    @abstractmethod
+    def end(self):
+        pass
+
 #Abstract class whoses subclasses are the methods that the program can be run by
-class AbstractSimulationCommand(ABC):
+class SimulationController:
     def __init__(self,particles,simulationParams,viewParams):
         self.particles = particles
         self.simulationParams = simulationParams
         self.viewParams = viewParams
         self.viewCreator = ViewCreator(particles,viewParams)
         self.simulator = Simulator(particles,simulationParams.halfWidth,simulationParams.theta,simulationParams.maxDepth)
+        self.listeners = []
 
-    @abstractmethod
     def setUp(self):
-        pass
+        for l in self.listeners:
+            l.setUp()
 
     def simulate(self):
         for t in range(self.simulationParams.numberOfCycles()):
@@ -35,47 +49,48 @@ class AbstractSimulationCommand(ABC):
             if not carryOn:
                 return
 
-    @abstractmethod
     def onTick(self):
-        pass
+        carryOn = True
+        for l in self.listeners:
+            if not l.onTick(self.viewCreator.getCurrentView()):
+                carryOn =  False
+        return carryOn
 
-    @abstractmethod
     def end(self):
-        pass
+        for l in self.listeners:
+            l.end()
+
+    def addListener(self,l):
+        self.listeners.append(l)
 
     def execute(self):
         self.setUp()
         self.simulate()
         self.end()
 
-class SimulateToFile(AbstractSimulationCommand):
-    def __init__(self,particles,simulationParams,viewParams,fileName,FPS):
-        AbstractSimulationCommand.__init__(self,particles,simulationParams,viewParams)
+class SimulateToFile(SimulationListener):
+    def __init__(self,fileName,FPS):
         self.fileName = fileName
         self.FPS = FPS
     def setUp(self):
         fourcc = VideoWriter_fourcc(*'mp4v')
         self.video = VideoWriter(self.fileName, fourcc, self.FPS, (500, 500))
-    def onTick(self):
-        frame = self.viewCreator.getCurrentView()
-        self.video.write(frame)
+    def onTick(self,currentView):
+        self.video.write(currentView)
         return True
     def end(self):
         self.video.release()
 
-class SimulateAndShow(AbstractSimulationCommand):
-    def __init__(self,particles,simulationParams,viewParams,windowName):
-        AbstractSimulationCommand.__init__(self,particles,simulationParams,viewParams)
+class SimulateAndShow(SimulationListener):
+    def __init__(self,windowName):
         self.windowName = windowName
 
 
     def setUp(self):
-        self.viewCreator = ViewCreator(self.particles,self.viewParams)
         cv2.namedWindow(self.windowName)
 
-    def onTick(self):
-        frame = self.viewCreator.getCurrentView()
-        cv2.imshow(self.windowName, frame)
+    def onTick(self,currentView):
+        cv2.imshow(self.windowName, currentView)
 
         k=cv2.waitKey(1)&0xFF
         return k!=27

@@ -5,7 +5,7 @@ import cv2
 
 sys.path.append(os.path.abspath("."))
 
-from barneshut.simulationCommand import *
+from barneshut.simulationController import *
 from barneshut.view import *
 from barneshut.GUI.parameterForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
@@ -67,12 +67,11 @@ class Page(tk.Frame):
             return;
         viewParams = self.parameterForms.getViewParameters()
         simulationParams = self.parameterForms.getSimulationParameters()
-        if self.runType.get() == 0:
-            command = SimulateAndShow(self.particles,simulationParams,viewParams,'Barnes Hut Simulation')
-            command.execute()
-        elif self.runType.get() == 1:
-            command = SimulateToFile(self.particles,simulationParams,viewParams,self.folderLocation+self.fileName,FPS)
-            command.execute()
+        controller = SimulationController(self.particles,simulationParams,viewParams)
+        controller.addListener(SimulateAndShow('Barnes Hut Simulation'))
+        if self.runType.get() == 1:
+            controller.addListener(SimulateToFile(self.folderLocation+self.fileName,FPS))
+        controller.execute()
 
 
 root = tk.Tk()
