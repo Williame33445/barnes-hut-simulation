@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath("."))
 
 from barneshut.simulationCommand import *
 from barneshut.view import *
-from barneshut.GUI.numericalForm import *
+from barneshut.GUI.parameterForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
 #error: The initial particles are not stored unless they are stored in main memory, so running several times means that you don't start at the intial state again.
