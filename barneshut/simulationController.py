@@ -51,8 +51,9 @@ class SimulationController:
 
     def onTick(self):
         carryOn = True
+        currentView = self.viewCreator.getCurrentView()
         for l in self.listeners:
-            if not l.onTick(self.viewCreator.getCurrentView()):
+            if not l.onTick(currentView):
                 carryOn =  False
         return carryOn
 
