@@ -1,8 +1,6 @@
 import sys
 import os
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import filedialog
 import cv2
 
 sys.path.append(os.path.abspath("."))
@@ -12,13 +10,10 @@ from barneshut.view import *
 from barneshut.GUI.numericalForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-
-
-
-master = tk.Tk()
-master.geometry("1000x300")
+#error: The initial particles are not stored unless they are stored in main memory, so running several times means that you don't start at the intial state again.
 
 FPS = 24
+BG='#EEEEEE'
 
 #this part will be removed when load particle options are done properly
 def getParticles(location):
@@ -40,71 +35,48 @@ def getData(location,line):
         return data[line]
 
 
-class Page:
-    def __init__(self,viewParametersForm,simulationParametersForm):
-        #sim is 1 view is 2
-        self.viewParametersForm = viewParametersForm
-        self.simulationParametersForm = simulationParametersForm
-        self.fileName = "\\data.mp4"
-        self.factor = 2
+class Page(tk.Frame):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.pack(ipadx=15,ipady=15)
+        self.parameterForms = ParameterForms(self)
+        self.fileName = "/data.mp4"
         #0 is run and show, 1 in simulate to file
         self.runType = tk.IntVar()
-        self.folderLocation = "C:\\workspace\\git-repos\\barnes-hut-simulation\\barneshut\\data\\data1"
+        self.folderLocation = "barneshut/data/data2"
+        self.layout()
 
-    def runForms(self):
-        self.viewParametersForm.createForm()
-        self.simulationParametersForm.createForm()
-        tk.Button(master,text='Save Parameters', command=self.saveAll).place(x=10,y=50*self.factor)
-        tk.Button(master,text="Load Parameters",command=self.load).place(x=115,y=50*self.factor)
-        tk.Button(master,text="Run",command=self.run).place(x=10,y=80+50*self.factor)
-        tk.Checkbutton(master,text="Run to file",variable=self.runType).place(x=50,y=80+50*self.factor)
-        tk.Button(master,text="Load Particles and Preview",command=self.viewParticles).place(x=10,y=40+50*self.factor)
+    def layout(self):
+        buttonFrame = tk.LabelFrame(self,text="Simulate",bg=BG)
+        buttonFrame.pack(ipady=15)
+        tk.Button(buttonFrame,text="Run",command=self.run).pack(side=tk.LEFT,padx=10)
+        tk.Checkbutton(buttonFrame,text="Run to file",variable=self.runType).pack(side=tk.LEFT,padx=10)
+        tk.Button(buttonFrame,text="Load Particles and Preview",command=self.viewParticles).pack(side=tk.LEFT,padx=10)
 
     def viewParticles(self):
-        self.getAllParameters()
-        self.getParticles()
-        viewCreator = ViewCreator(self.particles,self.viewParams)
-        windowName = "Inital State"
+        self.particles = getParticles(self.folderLocation + "/particles.csv")
+        viewParams = self.parameterForms.getViewParameters()
+        viewCreator = ViewCreator(self.particles,viewParams)
+        windowName = "Initial State"
         cv2.namedWindow(windowName)
         frame = viewCreator.getCurrentView()
         cv2.imshow(windowName,frame)
 
-
-    def load(self):
-        self.simulationParametersForm.loadFromFile(self.folderLocation)
-        self.viewParametersForm.loadFromFile(self.folderLocation)
-
-    def getAllParameters(self):
-        #put errors in here eventually 
-        self.simulationParams = self.simulationParametersForm.getParams()
-        self.viewParams = self.viewParametersForm.getParams()
-        
-
-    def getParticles(self):
-        self.particles = getParticles(self.folderLocation + "\\particles.csv")   
-
-    def run(self): 
-        self.getAllParameters()
-        self.getParticles
+    def run(self):
+        if self.particles == None:
+            return;
+        viewParams = self.parameterForms.getViewParameters()
+        simulationParams = self.parameterForms.getSimulationParameters()
         if self.runType.get() == 0:
-            command = SimulateAndShow(self.particles,self.simulationParams,self.viewParams,'Circle')
+            command = SimulateAndShow(self.particles,simulationParams,viewParams,'Barnes Hut Simulation')
             command.execute()
         elif self.runType.get() == 1:
-            command = SimulateToFile(self.particles,self.simulationParams,self.viewParams,self.folderLocation+self.fileName,FPS)
+            command = SimulateToFile(self.particles,simulationParams,viewParams,self.folderLocation+self.fileName,FPS)
             command.execute()
 
-    def saveAll(self):
-        self.simulationParametersForm.saveSimulationToFile(self.folderLocation)
-        self.viewParametersForm.saveSimulationToFile(self.folderLocation)
-        #need to add particles in here at some point
 
-
-
-temp1 = SimulationParametersForm(0,master)
-temp2 = ViewParametersForm(2,master)
-var = Page(temp2,temp1)
-var.runForms()
-
-
+root = tk.Tk()
+root.title('Barnes Hut')
+Page(root)
 
 tk.mainloop()
