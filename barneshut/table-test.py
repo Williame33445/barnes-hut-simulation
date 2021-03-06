@@ -8,7 +8,7 @@ import math
 
 class DataPager:
     def __init__(self,allPages,rowsPerPage=5):
-        self.pageNumber = 0
+        self.pageIndex = 0
         self.rowsPerPage = rowsPerPage 
         self.allPages = allPages
         self.pageData = []
@@ -18,10 +18,10 @@ class DataPager:
         self.pageData = self.allPages[pageStart:pageStart+self.rowsPerPage]
 
     def firstRowIndex(self):
-        return self.pageNumber*self.rowsPerPage
+        return self.pageIndex*self.rowsPerPage
 
     def goToPage(self,page):
-        self.pageNumber = page
+        self.pageIndex = page
         self.refresh()
 
     def addBlankData(self,index):
@@ -34,6 +34,10 @@ class DataPager:
 
     def displayedRowCount(self):
         return len(self.pageData)
+
+    def isLastPage(self):
+        return (self.pageIndex+1)*self.rowsPerPage >= len(self.allPages)
+
 
         
             
@@ -86,10 +90,13 @@ class Table:
                 self.deleteRow(x)
             self.addRowButtons.append(newButton("+",addRowToGrid,x+1,7))
             self.deleteRowButtons.append(newButton("-",deleteRowFromGrid,x+1,8))
+
+    def enabledIf(self,condition):
+        return "normal" if condition else "disabled"
             
-    def insertLine(self,rowIndex):
+    def refreshLine(self,rowIndex):
         rowExists = rowIndex < self.pager.displayedRowCount()
-        state = "normal" if rowExists else "disabled"
+        state = self.enabledIf(rowExists)
         for c in range(self.columns):
             value = self.pager.pageData[rowIndex][c] if rowExists else ""
             cell = self.e[rowIndex][c]
@@ -99,17 +106,33 @@ class Table:
             cell.insert(0, value)
             cell.config(state=state)
 
+    def refreshData(self):
+        for r in range(self.pager.rowsPerPage):
+            self.refreshLine(r)
 
-    
+    def refreshButtons(self):
+        previousPageState = self.enabledIf(self.pager.pageIndex > 0)
+        self.previousPageButton.config(state=previousPageState)
+
+        nextPageState = self.enabledIf(not self.pager.isLastPage())
+        self.nextPageButton.config(state=nextPageState)
+
+        for r in range(self.pager.rowsPerPage):
+            addButtonState = self.enabledIf(r <= self.pager.displayedRowCount())
+            self.addRowButtons[r].config(state=addButtonState)
+            
+            deleteButtonState = self.enabledIf(r < self.pager.displayedRowCount())
+            self.deleteRowButtons[r].config(state=deleteButtonState)
+
 
     def refresh(self):
         self.pager.refresh()  
-        for r in range(self.pager.rowsPerPage):
-            self.insertLine(r)
+        self.refreshData()
+        self.refreshButtons()
 
     def saveDataToMemory(self,evt,i,j):
         #need to fix -----------------------------------------
-        index = self.pageNumber*5 + i
+        index = self.pageIndex*5 + i
         self.data[index][j] = evt.widget.get()
 
     def addRow(self,index):
@@ -121,11 +144,11 @@ class Table:
         self.refresh()
 
     def nextPage(self):
-        self.pager.pageNumber +=1
+        self.pager.pageIndex +=1
         self.refresh()
 
     def previousPage(self):
-        self.pager.pageNumber -=1
+        self.pager.pageIndex -=1
         self.refresh()
 
 
