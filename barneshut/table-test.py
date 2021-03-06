@@ -3,55 +3,46 @@
 from tkinter import *
 import csv
 import math
-
-class Data:
-    def __init__(self,data):
-        self.data = data
-
-    def getRows(self,start,end):
-        temp = []
-        for x in range(start,end):
-            if len(self.data) <= x:
-                break
-            temp.append([x] + self.data[x])
-        return temp
             
         
 
 class DataPager:
-    def __init__(self,allPages,rows):
+    def __init__(self,allPages,rowsPerPage=5):
         self.pageNumber = 0
-        self.rows = rows #call rowsPerPage
+        self.rowsPerPage = rowsPerPage 
         self.allPages = allPages
         self.pageData = []
 
-    def getPageData(self): #refresh
-        pageStart = self.pageNumber*self.rows
-        self.pageData = self.allPages.getRows(pageStart,pageStart+self.rows) # [:] list slicing
+    def refresh(self): #refresh
+        pageStart = self.firstRowIndex()
+        self.pageData = self.allPages[pageStart:pageStart+self.rowsPerPage]
 
     def storeRow(self,row,changedData): #updateRow
-        self.allPages.data[row+self.pageNumber*self.rows] = changedData
+        self.allPages[row+self.firstRowIndex()] = changedData
+
+    def firstRowIndex(self):
+        return self.pageNumber*self.rowsPerPage
 
     def goToPage(self,page):
         self.pageNumber = page
-        self.getPageData()
+        self.refresh()
 
     def indexMaxFinder(self): # We shouldn't need this. We should use the length of the pageData array.
-        self.getPageData()
-        if self.pageNumber < math.floor(len(self.allPages.data)/self.rows):
-            return self.rows
-        elif self.pageNumber == math.floor(len(self.allPages.data)/self.rows):
-            return (len(self.allPages.data)%self.rows)
+        self.refresh()
+        if self.pageNumber < math.floor(len(self.allPages)/self.rowsPerPage):
+            return self.rowsPerPage
+        elif self.pageNumber == math.floor(len(self.allPages)/self.rowsPerPage):
+            return (len(self.allPages)%self.rowsPerPage)
         else:
             return 0
 
     def addBlankData(self,index):
-        self.allPages.data.insert(index + self.pageNumber*self.rows,["","","","",""])
-        self.getPageData()
+        self.allPages.insert(index + self.firstRowIndex(),["","","","",""])
+        self.refresh()
 
     def deleteIndex(self,index):
-        del self.allPages.data[index + self.pageNumber*self.rows]
-        self.getPageData()
+        del self.allPages[index + self.firstRowIndex()]
+        self.refresh()
         
             
 
@@ -60,20 +51,19 @@ class Table:
         self.root = root
         
         self.parameters = ["#","Mass","PositionX","PositionY","VelocityX","VelocityY"]
-        self.rows = 5
         self.columns = len(self.parameters)
         
-        self.pageData = DataPager(Data(data),self.rows)
+        self.pageData = DataPager(data)
         self.e = []
 
         self.createHeader()
         self.createTable()
         self.createButtons()
-        self.refreshPage()
+        self.refresh()
 
     def createTable(self):
        self.e = []
-       for i in range(self.rows):
+       for i in range(self.pageData.rowsPerPage):
             self.e.append([])
             for j in range(self.columns):
                 self.e[i].append(Entry(self.root, width=10, fg='blue', font=('Arial',16,'bold')))
@@ -93,7 +83,7 @@ class Table:
             b = Button(self.root,text=text,command=command)
             b.grid(row=row,column=column)
             return b
-        self.refreshButton = newButton("Refresh",self.refreshPage,6,1)
+        self.refreshButton = newButton("Refresh",self.refresh,6,1)
         self.previousPageButton = newButton("Previous Page",self.previousPage,6,2)
         self.nextPageButton = newButton("Next Page",self.nextPage,6,3)
         self.addRowButtons = []
@@ -112,13 +102,9 @@ class Table:
             self.e[row][x].delete(0,END)
             self.e[row][x].insert(0, data[x])
 
-    def refreshPage(self):
-        self.pageData.getPageData()           
+    def refresh(self):     
         for x in range(self.pageData.indexMaxFinder()):
-            self.insertLine(self.pageData.pageData[x],x)
-
-    def resetPage(self):
-        self.refreshPage()
+            self.insertLine([self.pageData.firstRowIndex()+x] + self.pageData.pageData[x],x)
 
     def saveDataToMemory(self,evt,i,j):
         #need to fix -----------------------------------------
@@ -127,19 +113,19 @@ class Table:
 
     def addRow(self,index):
         self.pageData.addBlankData(index)
-        self.resetPage()
+        self.refresh()
 
     def deleteRow(self,index):
         self.pageData.deleteIndex(index)
-        self.resetPage()
+        self.refresh()
 
     def nextPage(self):
         self.pageData.pageNumber +=1
-        self.resetPage()
+        self.refresh()
 
     def previousPage(self):
         self.pageData.pageNumber -=1
-        self.resetPage()
+        self.refresh()
 
 
 
