@@ -64,7 +64,7 @@ class Page(tk.Frame):
 
     def run(self):
         if self.particles == None:
-            return;
+            return
         viewParams = self.parameterForms.getViewParameters()
         simulationParams = self.parameterForms.getSimulationParameters()
         controller = SimulationController(self.particles,simulationParams,viewParams)
