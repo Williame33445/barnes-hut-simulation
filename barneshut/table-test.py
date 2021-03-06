@@ -65,7 +65,7 @@ class Table:
                 self.e[i].append(Entry(self.root, width=10, fg='blue', font=('Arial',16,'bold')))
                 self.e[i][j].grid(row=i+1, column=j)
                 def cellChanged(evt,i=i,j=j): # We have to define this function here to capture the current value of i and j
-                    self.saveDataToMemory(evt,i,j)
+                    self.pager.pageData[i][j] = evt.widget.get()
                 self.e[i][j].bind("<FocusOut>",cellChanged)
 
     def createHeader(self):
@@ -129,11 +129,6 @@ class Table:
         self.pager.refresh()  
         self.refreshData()
         self.refreshButtons()
-
-    def saveDataToMemory(self,evt,i,j):
-        #need to fix -----------------------------------------
-        index = self.pageIndex*5 + i
-        self.data[index][j] = evt.widget.get()
 
     def addRow(self,index):
         self.pager.addBlankData(index)
