@@ -12,6 +12,10 @@ from barneshut.simulator import *
 from barneshut.view import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
+#is a abstract class, when an event occurs a method from the listener is called and the listener updates itself
+"""Listeners are required so the user can run the program with both settings at the same time, while not having to 
+run it literally twice. The functions of simulation listener are defined as the functions that are called differently
+by the 2 ways that functions can be run."""
 class SimulationListener(ABC):
 
     @abstractmethod
@@ -26,7 +30,7 @@ class SimulationListener(ABC):
     def end(self):
         pass
 
-#Abstract class whoses subclasses are the methods that the program can be run by
+#Class that defines the comman functions between the 2 ways the simulation can be executed
 class SimulationController:
     def __init__(self,particles,simulationParams,viewParams):
         self.particles = particles
@@ -37,6 +41,7 @@ class SimulationController:
         self.listeners = []
 
     def setUp(self):
+        #calls set up on all of the listeners
         for l in self.listeners:
             l.setUp()
 
@@ -44,7 +49,7 @@ class SimulationController:
         for t in range(self.simulationParams.numberOfCycles()):
             #applies the accelerations and the velocities to the particles
             self.simulator.tick(self.simulationParams.tickPeriod)
-            #updates the video file to take into account the current frame
+            #checks to see if any of the listeners want to stop
             carryOn = self.onTick()
             if not carryOn:
                 return
@@ -52,6 +57,7 @@ class SimulationController:
     def onTick(self):
         carryOn = True
         currentView = self.viewCreator.getCurrentView()
+        #if any of the listeners onTick is false then the program is stoped
         for l in self.listeners:
             if not l.onTick(currentView):
                 carryOn =  False
@@ -69,6 +75,7 @@ class SimulationController:
         self.simulate()
         self.end()
 
+#Subclass the the listener that deals with simulations to file
 class SimulateToFile(SimulationListener):
     def __init__(self,fileName,FPS):
         self.fileName = fileName
@@ -82,10 +89,10 @@ class SimulateToFile(SimulationListener):
     def end(self):
         self.video.release()
 
+#Subclass the the listener that deals with simulations directly to the screen
 class SimulateAndShow(SimulationListener):
     def __init__(self,windowName):
         self.windowName = windowName
-
 
     def setUp(self):
         cv2.namedWindow(self.windowName)

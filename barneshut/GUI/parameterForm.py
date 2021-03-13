@@ -12,17 +12,22 @@ from barneshut.simulator import *
 
 BG='#EEEEEE'
 
+#General class that creates a form where you can input data for certain options, it creates its label frame inside
+#the parameter label frame 
 class NumericalForm(tk.LabelFrame):
     def __init__(self,parent,formName,options):
         super().__init__(parent,text=formName,bg=BG)
+        #the headings of the data
         self.options = options
         self.entryText = self.emptyStringVarList(len(options))
         self.layout()
     
     def get(self, i):
+        #gets a certain value from the entry points
         return float(self.entryText[i].get())
         
     def layout(self):
+        #create the labels of the input and the entry points for the input
         self.pack(side=tk.TOP,fill=tk.X,padx=10,pady=10)
         for x in range(len(self.options)):
             tk.Label(self,text=self.options[x],bg=BG).pack(side=tk.LEFT)
@@ -35,9 +40,9 @@ class NumericalForm(tk.LabelFrame):
         return line
 
     def setData(self,data):
+        #puts data into all the entry points
         for x in range(len(self.options)):
             self.entryText[x].set(float(data[x]))
-        # self.createForm()
 
     def emptyStringVarList(self,length):
         lst = []
@@ -46,6 +51,7 @@ class NumericalForm(tk.LabelFrame):
         return lst
     
     def saveToFile(self,file):
+        #saves the data currently stored in the widgets into a file
         file = open(file,"w")
         file.write(self.printHeaders() + "\n")
         for x in range(len(self.options)):
@@ -56,6 +62,7 @@ class NumericalForm(tk.LabelFrame):
 
     #returns a 2d list [line number][column], if line is 0 then return the all the lines
     def getData(self,location,line):
+        #retrives the data currently stored in memory
         data = []
         with open(location, 'r') as file:
             reader = csv.reader(file)
@@ -66,55 +73,68 @@ class NumericalForm(tk.LabelFrame):
         else:
             return data[line]
 
+#Class that creates simulation label form
 class SimulationParametersForm(NumericalForm):
     def __init__(self,parent):
         NumericalForm.__init__(self,parent,"Simulation",["Half Width","Tick Period","Total Duration","Theta","Max Depth"])
 
     def getParams(self):
+        #gets the parameters 
         return SimulationParams(self.get(0),self.get(1),self.get(2),self.get(3),self.get(4))
 
     def saveToFile(self,folder):
+        #saves the parameters
         super().saveToFile(folder + "/simulationParams.csv")
 
     def loadFromFile(self,folder):
+        #loads the parameters 
         simulationParamsData = self.getData(folder + "/simulationParams.csv",1)
         self.setData(simulationParamsData)
 
+#Class that creates simulation form
 class ViewParametersForm(NumericalForm):
     def __init__(self,parent):
         NumericalForm.__init__(self,parent,"View",["Width","Zoom","Mass Factor"])
 
     def getParams(self):
+        #gets the parameters
         return ViewParams(self.get(0),self.get(1),self.get(2))
 
     def saveToFile(self,folder):
+        #saves the parameters
         super().saveToFile(folder +  "/viewParams.csv")
 
     def loadFromFile(self,folder):
+        #loads the parameters
         simulationParamsData = self.getData(folder +  "/viewParams.csv",1)
         self.setData(simulationParamsData)
 
-
+#Class that defines the parameter frame inside the tk.frame frame
 class ParameterForms(tk.LabelFrame):
     def __init__(self,parent):
         super().__init__(parent,text="Parameters",bg=BG)
-        self.folderLocation = "barneshut/data/data1"
+        self.folderLocation = "barneshut/data/data1" #need allow this to be changed--------------------
         self.pack()
+        #defines the simulation and view forms inside the the parameter forms form
         self.simulationParametersForm = SimulationParametersForm(self)
         self.viewParametersForm = ViewParametersForm(self)
+        #defines the buttons in the parameter forms frame
         self.layout()
 
     def layout(self):
+        #defines another button frame and puts the buttons in it
         buttonFrame = tk.Frame(self,bg=BG)
         buttonFrame.pack(ipady=15)
         tk.Button(buttonFrame,text="Load Parameters",command=self.load).pack(side=tk.LEFT,padx=10)
         tk.Button(buttonFrame,text="Save Parameters",command=self.save).pack(side=tk.LEFT,padx=10)
 
     def load(self):
+        #gets the data
         self.simulationParametersForm.loadFromFile(self.folderLocation)
         self.viewParametersForm.loadFromFile(self.folderLocation)
 
     def save(self):
+        #saves the data to file
         self.simulationParametersForm.saveToFile(self.folderLocation)
         self.viewParametersForm.saveToFile(self.folderLocation)
 

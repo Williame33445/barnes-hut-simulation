@@ -10,7 +10,7 @@ from barneshut.view import *
 from barneshut.GUI.parameterForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-#error: The initial particles are not stored unless they are stored in main memory, so running several times means that you don't start at the intial state again.
+#error: view params or simulation params still seem to get from data1
 
 FPS = 24
 BG='#EEEEEE'
@@ -35,25 +35,34 @@ def getData(location,line):
         return data[line]
 
 
+#Page is a subclass of tk.Frame, where tk.Frame is the largest frame in the application that holds all other label frames
 class Page(tk.Frame):
     def __init__(self,parent):
         super().__init__(parent)
+        #defines the padding for the frame
         self.pack(ipadx=15,ipady=15)
+        #Creates the parameter form inside the Frame we are manipulating 
         self.parameterForms = ParameterForms(self)
         self.fileName = "/data.mp4"
         #0 is run and show, 1 in simulate to file
         self.runType = tk.IntVar()
-        self.folderLocation = "barneshut/data/data2"
+        self.folderLocation = "barneshut/data/data3"
+        #Creates the button frame inside the Frame
         self.layout()
 
     def layout(self):
+        #intialising the button label frame inside the Frame
         buttonFrame = tk.LabelFrame(self,text="Simulate",bg=BG)
         buttonFrame.pack(ipady=15)
+        #defining the buttons inside the button frame
         tk.Button(buttonFrame,text="Run",command=self.run).pack(side=tk.LEFT,padx=10)
         tk.Checkbutton(buttonFrame,text="Run to file",variable=self.runType).pack(side=tk.LEFT,padx=10)
         tk.Button(buttonFrame,text="Load Particles and Preview",command=self.viewParticles).pack(side=tk.LEFT,padx=10)
+        
+
 
     def viewParticles(self):
+        #gets the particles from data and then gets the initial frame
         self.particles = getParticles(self.folderLocation + "/particles.csv")
         viewParams = self.parameterForms.getViewParameters()
         viewCreator = ViewCreator(self.particles,viewParams)
@@ -63,11 +72,15 @@ class Page(tk.Frame):
         cv2.imshow(windowName,frame)
 
     def run(self):
+        #runs the barnes hut simulation, listeners are created depending on how the simulation is being executed
         if self.particles == None:
             return
         viewParams = self.parameterForms.getViewParameters()
         simulationParams = self.parameterForms.getSimulationParameters()
+
         controller = SimulationController(self.particles,simulationParams,viewParams)
+        #Adds the listeners needed for what the user has selected
+        #If the data is being saved to file both listeners will be used
         controller.addListener(SimulateAndShow('Barnes Hut Simulation'))
         if self.runType.get() == 1:
             controller.addListener(SimulateToFile(self.folderLocation+self.fileName,FPS))
@@ -77,5 +90,6 @@ class Page(tk.Frame):
 root = tk.Tk()
 root.title('Barnes Hut')
 Page(root)
+
 
 tk.mainloop()
