@@ -3,11 +3,13 @@ import os
 import tkinter as tk
 import cv2
 
+
 sys.path.append(os.path.abspath("."))
 
 from barneshut.simulationController import *
 from barneshut.view import *
 from barneshut.GUI.parameterForm import *
+from barneshut.GUI.directoryForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
 #error: view params or simulation params still seem to get from data1
@@ -41,14 +43,17 @@ class Page(tk.Frame):
         super().__init__(parent)
         #defines the padding for the frame
         self.pack(ipadx=15,ipady=15)
+        self.directoryForm = DirectoryForm(self,BG)
         #Creates the parameter form inside the Frame we are manipulating 
-        self.parameterForms = ParameterForms(self)
+        self.parameterForms = ParameterForms(self,self.getFolderLocation) #passing in a function
         self.fileName = "/data.mp4"
         #0 is run and show, 1 in simulate to file
         self.runType = tk.IntVar()
-        self.folderLocation = "barneshut/data/data3"
         #Creates the button frame inside the Frame
         self.layout()
+
+    def getFolderLocation(self):
+        return self.directoryForm.folderLocation
 
     def layout(self):
         #intialising the button label frame inside the Frame
@@ -58,12 +63,10 @@ class Page(tk.Frame):
         tk.Button(buttonFrame,text="Run",command=self.run).pack(side=tk.LEFT,padx=10)
         tk.Checkbutton(buttonFrame,text="Run to file",variable=self.runType).pack(side=tk.LEFT,padx=10)
         tk.Button(buttonFrame,text="Load Particles and Preview",command=self.viewParticles).pack(side=tk.LEFT,padx=10)
-        
-
 
     def viewParticles(self):
         #gets the particles from data and then gets the initial frame
-        self.particles = getParticles(self.folderLocation + "/particles.csv")
+        self.particles = getParticles(self.getFolderLocation() + "/particles.csv")
         viewParams = self.parameterForms.getViewParameters()
         viewCreator = ViewCreator(self.particles,viewParams)
         windowName = "Initial State"
@@ -83,13 +86,13 @@ class Page(tk.Frame):
         #If the data is being saved to file both listeners will be used
         controller.addListener(SimulateAndShow('Barnes Hut Simulation'))
         if self.runType.get() == 1:
-            controller.addListener(SimulateToFile(self.folderLocation+self.fileName,FPS))
+            controller.addListener(SimulateToFile(self.getFolderLocation()+self.fileName,FPS))
         controller.execute()
 
 
 root = tk.Tk()
 root.title('Barnes Hut')
-Page(root)
+page = Page(root)
 
 
 tk.mainloop()

@@ -15,8 +15,9 @@ BG='#EEEEEE'
 #General class that creates a form where you can input data for certain options, it creates its label frame inside
 #the parameter label frame 
 class NumericalForm(tk.LabelFrame):
-    def __init__(self,parent,formName,options):
+    def __init__(self,parent,getFolderLocation,formName,options):
         super().__init__(parent,text=formName,bg=BG)
+        self.getFolderLocation = getFolderLocation
         #the headings of the data
         self.options = options
         self.entryText = self.emptyStringVarList(len(options))
@@ -75,49 +76,48 @@ class NumericalForm(tk.LabelFrame):
 
 #Class that creates simulation label form
 class SimulationParametersForm(NumericalForm):
-    def __init__(self,parent):
-        NumericalForm.__init__(self,parent,"Simulation",["Half Width","Tick Period","Total Duration","Theta","Max Depth"])
+    def __init__(self,parent,getFolderLocation):
+        NumericalForm.__init__(self,parent,getFolderLocation,"Simulation",["Half Width","Tick Period","Total Duration","Theta","Max Depth"])
 
     def getParams(self):
         #gets the parameters 
         return SimulationParams(self.get(0),self.get(1),self.get(2),self.get(3),self.get(4))
 
-    def saveToFile(self,folder):
+    def saveToFile(self):
         #saves the parameters
-        super().saveToFile(folder + "/simulationParams.csv")
+        super().saveToFile(self.getFolderLocation() + "/simulationParams.csv")
 
-    def loadFromFile(self,folder):
+    def loadFromFile(self):
         #loads the parameters 
-        simulationParamsData = self.getData(folder + "/simulationParams.csv",1)
+        simulationParamsData = self.getData(self.getFolderLocation() + "/simulationParams.csv",1)
         self.setData(simulationParamsData)
 
 #Class that creates simulation form
 class ViewParametersForm(NumericalForm):
-    def __init__(self,parent):
-        NumericalForm.__init__(self,parent,"View",["Width","Zoom","Mass Factor"])
+    def __init__(self,parent,getFolderLocation):
+        NumericalForm.__init__(self,parent,getFolderLocation,"View",["Width","Zoom","Mass Factor"])
 
     def getParams(self):
         #gets the parameters
         return ViewParams(self.get(0),self.get(1),self.get(2))
 
-    def saveToFile(self,folder):
+    def saveToFile(self):
         #saves the parameters
-        super().saveToFile(folder +  "/viewParams.csv")
+        super().saveToFile(self.getFolderLocation() +  "/viewParams.csv")
 
-    def loadFromFile(self,folder):
+    def loadFromFile(self):
         #loads the parameters
-        simulationParamsData = self.getData(folder +  "/viewParams.csv",1)
+        simulationParamsData = self.getData(self.getFolderLocation() +  "/viewParams.csv",1)
         self.setData(simulationParamsData)
 
 #Class that defines the parameter frame inside the tk.frame frame
 class ParameterForms(tk.LabelFrame):
-    def __init__(self,parent):
+    def __init__(self,parent,getFolderLocation):
         super().__init__(parent,text="Parameters",bg=BG)
-        self.folderLocation = "barneshut/data/data1" #need allow this to be changed--------------------
         self.pack()
         #defines the simulation and view forms inside the the parameter forms form
-        self.simulationParametersForm = SimulationParametersForm(self)
-        self.viewParametersForm = ViewParametersForm(self)
+        self.simulationParametersForm = SimulationParametersForm(self,getFolderLocation)
+        self.viewParametersForm = ViewParametersForm(self,getFolderLocation)
         #defines the buttons in the parameter forms frame
         self.layout()
 
@@ -130,18 +130,21 @@ class ParameterForms(tk.LabelFrame):
 
     def load(self):
         #gets the data
-        self.simulationParametersForm.loadFromFile(self.folderLocation)
-        self.viewParametersForm.loadFromFile(self.folderLocation)
+        self.simulationParametersForm.loadFromFile()
+        self.viewParametersForm.loadFromFile()
 
     def save(self):
         #saves the data to file
-        self.simulationParametersForm.saveToFile(self.folderLocation)
-        self.viewParametersForm.saveToFile(self.folderLocation)
+        self.simulationParametersForm.saveToFile()
+        self.viewParametersForm.saveToFile()
 
     def getSimulationParameters(self):
         return self.simulationParametersForm.getParams()
 
     def getViewParameters(self):
         return self.viewParametersForm.getParams()
+
+    def changeFolderLoaction(self,newLocation):
+        self.folderLocation = newLocation
 
 
