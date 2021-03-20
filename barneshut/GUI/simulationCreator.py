@@ -18,25 +18,6 @@ from barneshut.GUI.particleForm import *
 FPS = 24
 BG='#EEEEEE'
 
-#this part will be removed when load particle options are done properly
-def getParticles(location):
-    particles = getData(location,0)
-    particles.pop(0)
-    kinematicParticles = []
-    for x in particles:
-        kinematicParticles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
-    return kinematicParticles
-def getData(location,line):
-    data = []
-    with open(location, 'r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            data.append(row)
-    if line == 0:
-        return data
-    else:
-        return data[line]
-
 
 #Page is a subclass of tk.Frame, where tk.Frame is the largest frame in the application that holds all other label frames
 class Page(tk.Frame):
@@ -68,9 +49,9 @@ class Page(tk.Frame):
 
     def viewParticles(self):
         #gets the particles from data and then gets the initial frame
-        self.particles = getParticles(self.getFolderLocation() + "/particles.csv")
+        particles = self.particleForm.getParticles()
         viewParams = self.parameterForms.getViewParameters()
-        viewCreator = ViewCreator(self.particles,viewParams)
+        viewCreator = ViewCreator(particles,viewParams)
         windowName = "Initial State"
         cv2.namedWindow(windowName)
         frame = viewCreator.getCurrentView()
@@ -78,12 +59,11 @@ class Page(tk.Frame):
 
     def run(self):
         #runs the barnes hut simulation, listeners are created depending on how the simulation is being executed
-        if self.particles == None:
-            return
+        particles = self.particleForm.getParticles()
         viewParams = self.parameterForms.getViewParameters()
         simulationParams = self.parameterForms.getSimulationParameters()
 
-        controller = SimulationController(self.particles,simulationParams,viewParams)
+        controller = SimulationController(particles,simulationParams,viewParams)
         #Adds the listeners needed for what the user has selected
         #If the data is being saved to file both listeners will be used
         controller.addListener(SimulateAndShow('Barnes Hut Simulation'))

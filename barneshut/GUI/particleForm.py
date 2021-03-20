@@ -15,18 +15,19 @@ from barneshut.particle import *
 class ParticleForm(tk.LabelFrame):
     def __init__(self,parent,BG,getFolderLocation):
         super().__init__(parent,bg =BG,text="Particles")
+        #giving particles by reference
+        self.particles = []
         self.getFolderLocation =  getFolderLocation
         self.pack()
-        #Entry(self, width=10, fg='blue', font=('Arial',16,'bold'))
-        self.table = Table(self.getParticles(),self)
+        self.loadParticles()
+        self.table = Table(self.particles,self)
 
-    def getParticles(self):
-        particles = self.getData(0)
-        particles.pop(0)
-        kinematicParticles = []
-        for x in particles:
-            kinematicParticles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
-        return kinematicParticles
+    def loadParticles(self):
+        particlesFromFile = self.getData(0)
+        particlesFromFile.pop(0)
+        self.particles.clear()
+        for x in particlesFromFile:
+            self.particles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
 
     def getData(self,line):
         data = []
@@ -38,3 +39,6 @@ class ParticleForm(tk.LabelFrame):
             return data
         else:
             return data[line]
+
+    def getParticles(self):
+        return self.particles
