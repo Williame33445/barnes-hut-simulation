@@ -111,6 +111,16 @@ class Table:
             #exception
             return 0
 
+    def getAllData(self):
+        rowList = []
+        for r in range(len(self.pager.allPages)):
+            columnList = []
+            for c in range(self.columns):
+                columnList.append(self.getValue(r,c))
+            rowList.append(columnList)
+        return rowList
+
+
 
 
     def createHeader(self):
@@ -189,6 +199,10 @@ class Table:
     def previousPage(self):
         self.pager.pageIndex -=1
         self.refresh()
+
+    def rows(self):
+        return self.pager.rowsPerPage
+
 
 
 

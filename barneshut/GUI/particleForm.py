@@ -21,12 +21,21 @@ class ParticleForm(tk.LabelFrame):
         self.getFolderLocation =  getFolderLocation
         self.pack()
         self.table = Table(self.particles,self)
+        self.layout()
 
     def loadParticles(self):
         particlesFromFile = self.getData()
         self.particles.clear()
         for x in particlesFromFile:
             self.particles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
+        self.table.refresh()
+
+    def saveParticles(self):
+        with open(self.getFolderLocation() + "/particles.csv","w",newline="") as file:
+            file.truncate()
+            writer = csv.writer(file)
+            writer.writerow(self.table.parameters)
+            writer.writerows(self.table.getAllData())
 
     def getData(self):
         data = []
@@ -42,3 +51,8 @@ class ParticleForm(tk.LabelFrame):
         # don't want updated by the simulation(if we just returned self.particles the simulator would have a
         # pointer to the initial state of particles)
         return copy.deepcopy(self.particles)
+
+    def layout(self):
+        tk.Button(self,text="Load",command=self.loadParticles).grid(row=self.table.rows()+1, column=0)
+        tk.Button(self,text="Save",command=self.saveParticles).grid(row=self.table.rows()+1, column=1)
+
