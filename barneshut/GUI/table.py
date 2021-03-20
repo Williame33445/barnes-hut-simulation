@@ -123,7 +123,6 @@ class Table:
             b = Button(self.root,text=text,command=command)
             b.grid(row=row,column=column)
             return b
-        self.refreshButton = newButton("Refresh",self.refresh,6,1)
         self.previousPageButton = newButton("Previous Page",self.previousPage,6,2)
         self.nextPageButton = newButton("Next Page",self.nextPage,6,3)
         self.addRowButtons = []
