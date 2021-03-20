@@ -1,5 +1,3 @@
-- Some way(s) to generate initial state
-- selecting a working folder 
 - error handling
 
 
