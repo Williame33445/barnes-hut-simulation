@@ -11,6 +11,7 @@ from barneshut.view import *
 from barneshut.GUI.parameterForm import *
 from barneshut.GUI.directoryForm import *
 from cv2 import VideoWriter, VideoWriter_fourcc
+from barneshut.GUI.particleForm import *
 
 #error: view params or simulation params still seem to get from data1
 
@@ -46,6 +47,7 @@ class Page(tk.Frame):
         self.directoryForm = DirectoryForm(self,BG)
         #Creates the parameter form inside the Frame we are manipulating 
         self.parameterForms = ParameterForms(self,self.getFolderLocation) #passing in a function
+        self.particleForm = ParticleForm(self,BG,self.getFolderLocation)
         self.fileName = "/data.mp4"
         #0 is run and show, 1 in simulate to file
         self.runType = tk.IntVar()

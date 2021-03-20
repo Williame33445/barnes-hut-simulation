@@ -53,6 +53,10 @@ class KinematicParticle(Particle):
 def particle(mass,x,y):
     return Particle(mass,Vector(x,y))
 
+def kinematicParticle(mass,x,y,vx,vy):
+    return KinematicParticle(mass,Vector(x,y),Vector(vx,vy))
+
+
 def zeroVector():
     return Vector(0.0, 0.0)
     
