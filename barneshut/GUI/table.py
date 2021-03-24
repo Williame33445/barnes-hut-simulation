@@ -61,6 +61,7 @@ class Table:
         self.createButtons()
         self.refresh()
 
+    #creates the table 
     def createTable(self):
        self.e = []
        for i in range(self.pager.rowsPerPage):
@@ -80,6 +81,7 @@ class Table:
         except:
             return None
 
+#these 2 functions allow the user to convert between kinematic particle and .csv data
     def setValue(self,r,c,val):
         particle =  self.pager.pageData[r]
         if c == 0:
@@ -120,9 +122,6 @@ class Table:
             rowList.append(columnList)
         return rowList
 
-
-
-
     def createHeader(self):
         for x in range(self.columns):
             label = Label(self.root,text=self.parameters[x])
@@ -147,7 +146,8 @@ class Table:
 
     def enabledIf(self,condition):
         return "normal" if condition else "disabled"
-            
+
+    #refreshes the current data in the page 
     def refreshLine(self,rowIndex):
         rowExists = rowIndex < self.pager.displayedRowCount()
         state = self.enabledIf(rowExists)
@@ -202,13 +202,4 @@ class Table:
 
     def rows(self):
         return self.pager.rowsPerPage
-
-
-
-
-
-
-#create and delete should only come up around enabled entry parts
-   
-# create root window 
 

@@ -14,6 +14,7 @@ from barneshut.simulator import *
 defultDir = "C:/workspace/git-repos/barnes-hut-simulation/barneshut/data/data1"
 
 #this frame allows the user to change the directory
+#Its passed into other classes as a parameter and when the user wants to know the directory it uses this class
 class DirectoryForm(tk.LabelFrame):
     def __init__(self,parent,BG):
         super().__init__(parent,bg =BG,text="")
@@ -41,6 +42,4 @@ class DirectoryForm(tk.LabelFrame):
         self.folderLocation = self.directoryEntry.get()
 
 
-
-#when do we want to enable folder locations.
         
