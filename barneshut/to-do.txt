@@ -1,5 +1,5 @@
 - error handling
-
+- if you are trying to write to a file and you end the program before the tick time is up, the mp4 will not run
 
 
 Future enhancements

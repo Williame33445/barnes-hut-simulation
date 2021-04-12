@@ -63,17 +63,17 @@ class Table:
 
     #creates the table 
     def createTable(self):
-       self.e = []
-       for i in range(self.pager.rowsPerPage):
-            self.e.append([])
-            for j in range(self.columns):
-                self.e[i].append(Entry(self.root, width=10, fg='blue', font=('Arial',16,'bold')))
-                self.e[i][j].grid(row=i+1, column=j)
-                def cellChanged(evt,i=i,j=j): # We have to define this function here to capture the current value of i and j
-                    val = self.toFloat(evt.widget.get())
-                    if val != None:
-                        self.setValue(i,j,val)
-                self.e[i][j].bind("<FocusOut>",cellChanged)
+        self.e = []
+        for i in range(self.pager.rowsPerPage):
+                self.e.append([])
+                for j in range(self.columns):
+                    self.e[i].append(Entry(self.root, width=10, fg='blue', font=('Arial',16,'bold')))
+                    self.e[i][j].grid(row=i+1, column=j)
+                    def cellChanged(evt,i=i,j=j): # We have to define this function here to capture the current value of i and j
+                        val = self.toFloat(evt.widget.get())
+                        if val != None:
+                            self.setValue(i,j,val)
+                    self.e[i][j].bind("<FocusOut>",cellChanged)
 
     def toFloat(self,v):
         try:
@@ -98,7 +98,10 @@ class Table:
             pass
 
     def getValue(self,r,c):
-        particle =  self.pager.pageData[r]
+        try:
+            particle =  self.pager.allPages[r]
+        except:
+            return
         if c == 0:
             return particle.mass
         elif c == 1:
@@ -114,6 +117,7 @@ class Table:
             return 0
 
     def getAllData(self):
+        self.refresh()
         rowList = []
         for r in range(len(self.pager.allPages)):
             columnList = []
@@ -152,7 +156,7 @@ class Table:
         rowExists = rowIndex < self.pager.displayedRowCount()
         state = self.enabledIf(rowExists)
         for c in range(self.columns):
-            value = str(self.getValue(rowIndex,c)) if rowExists else ""
+            value = str(self.getValue(rowIndex+self.pager.pageIndex*self.columns,c)) if rowExists else ""
             cell = self.e[rowIndex][c]
 
             cell.config(state="normal")
@@ -177,7 +181,6 @@ class Table:
             
             deleteButtonState = self.enabledIf(r < self.pager.displayedRowCount())
             self.deleteRowButtons[r].config(state=deleteButtonState)
-
 
     def refresh(self):
         self.pager.refresh()  

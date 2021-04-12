@@ -12,7 +12,6 @@ from barneshut.simulator import *
 from barneshut.view import *
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-#is a abstract class, when an event occurs a method from the listener is called and the listener updates itself
 """Listeners are required so the user can run the program with both settings at the same time, while not having to 
 run it literally twice. The functions of simulation listener are defined as the functions that are called differently
 by the 2 ways that functions can be run."""
