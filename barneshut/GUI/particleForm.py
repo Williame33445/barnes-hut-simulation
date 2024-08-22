@@ -27,7 +27,7 @@ class ParticleForm(tk.LabelFrame):
         particlesFromFile = self.getData()
         self.particles.clear()
         for x in particlesFromFile:
-            self.particles.append(KinematicParticle(float(x[0]),Vector(float(x[1]),float(x[2])),Vector(float(x[3]),float(x[4]))))
+            self.particles.append(KinematicParticle(float(x[0]),np.array([float(x[1]),float(x[2])]),np.array([float(x[3]),float(x[4])])))
         self.table.refresh()
 
     def saveParticles(self):

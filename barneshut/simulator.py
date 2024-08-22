@@ -1,5 +1,5 @@
-from barneshut.particle import zeroVector
 from barneshut.tree import treeNode
+import numpy as np
 
 #Class that deals with running the simulation
 class Simulator:
@@ -14,7 +14,7 @@ class Simulator:
 
     #creates the tree
     def buildTree(self):
-        self.rootNode = treeNode(zeroVector(),self.halfWidth,self.maxDepth,self.theta)
+        self.rootNode = treeNode(np.zeros(2),self.halfWidth,self.maxDepth,self.theta)
         self.addParticles()
         self.rootNode.findMassDistribution()
 
@@ -37,14 +37,14 @@ class Simulator:
         accelerations = allAccelerations()
         for x in range(len(self.particles)):
             acceleration = accelerations[x]
-            deltaVelocity = acceleration.times(timeElapsed)
-            self.particles[x].velocity.translate(deltaVelocity)
+            deltaVelocity = acceleration*timeElapsed
+            self.particles[x].velocity += deltaVelocity
         
     #applies the velocity to change the position
     def applyVelocity(self,timeElapsed):
         for p in self.particles:
-            deltaPosition = p.velocity.times(timeElapsed)
-            p.pos.translate(deltaPosition)
+            deltaPosition = p.velocity*timeElapsed
+            p.pos += deltaPosition
 
     #cycles through rebuilding the tree and applying the velocities
     def tick(self,timeElapsed):

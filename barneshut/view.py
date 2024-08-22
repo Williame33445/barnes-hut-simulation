@@ -18,7 +18,7 @@ class ViewParams:
     def scaled(self,v):
         return round(v * self.zoom)
     def scaledPos(self,particle):
-        return (self.scaled(particle.pos.x) + self.scaledHalfWidth, self.scaled(particle.pos.y) + self.scaledHalfWidth)
+        return (self.scaled(particle.pos[0]) + self.scaledHalfWidth, self.scaled(particle.pos[1]) + self.scaledHalfWidth)
     def scaledMass(self,particle):
         return round(particle.mass * self.massFactor)
 

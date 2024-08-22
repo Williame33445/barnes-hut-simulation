@@ -87,13 +87,13 @@ class Table:
         if c == 0:
             particle.mass =  val
         elif c == 1:
-            particle.pos.x = val
+            particle.pos[0] = val
         elif c == 2:
-            particle.pos.y = val
+            particle.pos[1] = val
         elif c == 3:
-            particle.velocity.x = val
+            particle.velocity[0] = val
         elif c == 4:
-            particle.velocity.y = val
+            particle.velocity[1] = val
         else:
             pass
 
@@ -105,13 +105,13 @@ class Table:
         if c == 0:
             return particle.mass
         elif c == 1:
-            return particle.pos.x
+            return particle.pos[0]
         elif c == 2:
-            return particle.pos.y
+            return particle.pos[1]
         elif c == 3:
-            return particle.velocity.x
+            return particle.velocity[0]
         elif c == 4:
-            return particle.velocity.y
+            return particle.velocity[1]
         else:
             #exception
             return 0

@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 from barneshut.particle import *
+import numpy as np
 
 """if the tree increases to the max depth then the objects tree becomes a non breaching node,
 which is basically a list of the particles inside it"""
@@ -27,7 +28,7 @@ class AbstractNode(ABC):
     """finds the acceleration of the particle through recursion of calculate net acceleration until its 
     below the theta value or a leaf node"""
     def netAccelerationOf(self,targetParticle):
-        r = self.combinedParticle.pos.distanceTo(targetParticle.pos)
+        r = np.linalg.norm(self.combinedParticle.pos-targetParticle.pos)
         d = self.halfWidth * 2
         if (d < self.theta * r):
             return targetParticle.accelerationTowards(self.combinedParticle)
@@ -81,11 +82,11 @@ class BranchingNode(AbstractNode):
     #     0 - top left, 1 - top right, 2 bottom left, 3 - bottom right
     def quadrantNumberFor(self,position):
         midPoint = self.midPoint
-        if (midPoint.x>position.x)and(midPoint.y>position.y):
+        if (midPoint[0]>position[0])and(midPoint[1]>position[1]):
             return 0
-        elif (midPoint.x<=position.x)and(midPoint.y>position.y):
+        elif (midPoint[0]<=position[0])and(midPoint[1]>position[1]):
             return 1
-        elif (midPoint.x>position.x)and(midPoint.y<=position.y):
+        elif (midPoint[0]>position[0])and(midPoint[1]<=position[1]):
             return 2
         else:
             return 3
@@ -102,8 +103,8 @@ class BranchingNode(AbstractNode):
             deltaX = [-childHalfWidth, +childHalfWidth, -childHalfWidth, +childHalfWidth]
             deltaY = [-childHalfWidth, -childHalfWidth, +childHalfWidth, +childHalfWidth]
             #calculate the offset
-            offset = Vector(deltaX[childIndex],deltaY[childIndex])
-            childMidpoint = self.midPoint.plus(offset)
+            offset = np.array([deltaX[childIndex],deltaY[childIndex]])
+            childMidpoint = self.midPoint + offset
             #define the child
             self.childNodes[childIndex] = treeNode(childMidpoint,childHalfWidth,self.maxDepth-1,self.theta)
         return self.childNodes[childIndex]
@@ -129,10 +130,10 @@ class BranchingNode(AbstractNode):
         if self.particleCount == 1:
             return targetParticle.accelerationTowards(self.combinedParticle)
         else:
-            netAcceleration = zeroVector()
+            netAcceleration = np.zeros(2)
             for c in self.children():
                 # Make a mutually recursive call for each child
-                netAcceleration.translate(c.netAccelerationOf(targetParticle))
+                netAcceleration += c.netAccelerationOf(targetParticle)
             return netAcceleration
 
 
@@ -151,7 +152,7 @@ class NonBranchingNode(AbstractNode):
 
     #if this gets called then its bellow the theta value and the particles are calculated exactly
     def calculateNetAcceleration(self,targetParticle):
-        netAcceleration = zeroVector()
+        netAcceleration = np.zeros(2)
         for p in self.particles:
-            netAcceleration.translate(targetParticle.accelerationTowards(p))
+            netAcceleration +=targetParticle.accelerationTowards(p)
         return netAcceleration

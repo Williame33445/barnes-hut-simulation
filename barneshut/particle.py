@@ -1,27 +1,8 @@
 import math 
+import numpy as np
 global G
 G = 6.67*10**-11
 
-class Vector:
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-    def plus(self,delta):
-        return Vector(self.x+delta.x, self.y+delta.y)
-    def minus(self,delta):
-        return Vector(self.x-delta.x, self.y-delta.y)
-    def times(self,factor):
-        return Vector(self.x*factor, self.y*factor)
-    def dividedBy(self,factor):
-        return Vector(self.x/factor, self.y/factor)
-    def distanceTo(self,pos2):
-        return math.sqrt((self.x-pos2.x)**2+(self.y-pos2.y)**2)
-    def translate(self,delta):
-        self.x += delta.x
-        self.y += delta.y
-    def __str__(self):
-        #allows you to define what str() does for this class
-        return "(" + str(self.x) + "," + str(self.y) + ")"
 
 class Particle:
     def __init__(self,mass,pos):
@@ -30,14 +11,12 @@ class Particle:
     def __str__(self):
         #allows you to define what str() does for this class
         return "mass=" + str(self.mass) + ",centre=" + str(self.pos)
-    def accelerationTowards(self,particle1):
-        r = particle1.pos.distanceTo(self.pos)
-        if r==0:
-            return Vector(0.0, 0.0)
-        magnitude = (G)*(particle1.mass)/(r**3)
-        #gives vector in the direction of the
-        direction = particle1.pos.minus(self.pos)
-        return direction.times(magnitude)
+    def accelerationTowards(self,p):
+        r = self.pos - p.pos
+        rMag = np.linalg.norm(r)
+        if rMag == 0:
+            return np.zeros(2) #is this required
+        return -G*p.mass*r/rMag**3
 
 
 #gives the initial state of the system
@@ -51,21 +30,19 @@ class KinematicParticle(Particle):
 
 #allows you to create a particle without first having to create a position
 def particle(mass,x,y):
-    return Particle(mass,Vector(x,y))
+    return Particle(mass,np.array([x,y]))
 
 def kinematicParticle(mass,x,y,vx,vy):
-    return KinematicParticle(mass,Vector(x,y),Vector(vx,vy))
+    return KinematicParticle(mass,np.array([x,y]),np.array([vx,vy]))
 
 
-def zeroVector():
-    return Vector(0.0, 0.0)
     
-def combinedParticle(particles):
+def combinedParticle(particles): #rename to Cm
     mass = 0
-    centre = zeroVector()
+    centre = np.zeros(2)
     for p in particles:
         mass += p.mass
-        centre = centre.plus(p.pos.times(p.mass))
-    centre = centre.dividedBy(mass)
+        centre += p.pos*p.mass
+    centre = centre/mass
     return Particle(mass, centre)
 
