@@ -47,8 +47,10 @@ class BranchingNode(AbstractNode):
         self.maxDepth = maxDepth
         self.childNodes = [None,None,None,None]
         self.particleCount = 0
+
     def children(self):
         return filter(None,self.childNodes)
+    
     def addParticle(self,newParticle):
         #if there are no particles in this node put the particle in here
         if self.particleCount == 0:
@@ -123,7 +125,7 @@ class BranchingNode(AbstractNode):
             #recursively runs find mass distribtion through the children of the nodes to find mass and center of mass
             c.findMassDistribution()
   
-        self.combinedParticle = combinedParticle(childCentresOfMass())
+        self.combinedParticle = getCM(childCentresOfMass())
 
     def calculateNetAcceleration(self,targetParticle):
         # If this is a leaf node (no children)..
@@ -148,7 +150,7 @@ class NonBranchingNode(AbstractNode):
 
     def findMassDistribution(self):
         #finds the center of mass averages the parameters for the nodes
-        self.combinedParticle = combinedParticle(self.particles)
+        self.combinedParticle = getCM(self.particles)
 
     #if this gets called then its bellow the theta value and the particles are calculated exactly
     def calculateNetAcceleration(self,targetParticle):

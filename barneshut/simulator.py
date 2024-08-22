@@ -22,6 +22,7 @@ class Simulator:
     def addParticles(self):
         for p in self.particles:
             self.rootNode.addParticle(p)
+            
     #finds acceleration of a single particle
     def netAccelerationOf(self,particle):
         return self.rootNode.netAccelerationOf(particle)
