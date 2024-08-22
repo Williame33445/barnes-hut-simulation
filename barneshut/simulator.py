@@ -51,7 +51,7 @@ class Simulator:
     def tick(self,timeElapsed):
         self.buildTree()
         self.applyVelocity(timeElapsed)
-        self.applyAcceleration(timeElapsed)
+        self.applyAcceleration(timeElapsed) #think this may be wrong
 
 #Class the controls how long the program runs for
 class SimulationParams:
