@@ -76,15 +76,19 @@ class SimulationController:
 
 #Subclass the the listener that deals with simulations to file
 class SimulateToFile(SimulationListener):
-    def __init__(self,fileName,FPS):
+    def __init__(self,fileName,FPS,pixels):
         self.fileName = fileName
         self.FPS = FPS
+        self.pixels = pixels
+
     def setUp(self):
         fourcc = VideoWriter.fourcc(*'mp4v')
-        self.video = VideoWriter(self.fileName, fourcc, self.FPS, (500, 500))
+        self.video = VideoWriter(self.fileName, fourcc, self.FPS, (self.pixels, self.pixels)) 
+
     def onTick(self,currentView):
         self.video.write(currentView)
         return True
+    
     def end(self):
         self.video.release()
 

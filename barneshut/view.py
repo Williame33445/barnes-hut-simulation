@@ -11,9 +11,9 @@ class ViewParams:
         self.markerThickness = markerThickness
         self.backgroundValue = backgroundValue
 
-        scaledWidth = self.scaled(width)
-        self.scaledHalfWidth = round(scaledWidth / 2)
-        self.frameShape = (scaledWidth, scaledWidth, 3) # width x height x three colours
+        self.scaledWidth = self.scaled(width)
+        self.scaledHalfWidth = round(self.scaledWidth / 2)
+        self.frameShape = (self.scaledWidth, self.scaledWidth, 3) # width x height x three colours
 
     def scaled(self,v):
         return round(v * self.zoom)

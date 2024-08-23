@@ -66,7 +66,7 @@ class Page(tk.Frame):
         #If the data is being saved to file both listeners will be used
         controller.addListener(SimulateAndShow('Barnes Hut Simulation'))
         if self.runType.get() == 1:
-            controller.addListener(SimulateToFile(self.getFolderLocation()+self.fileName,FPS))
+            controller.addListener(SimulateToFile(self.getFolderLocation()+self.fileName,FPS,viewParams.scaledWidth))
         controller.execute()
 
 

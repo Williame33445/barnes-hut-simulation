@@ -9,6 +9,8 @@ from barneshut.particle import *
 from barneshut.simulator import *
 from barneshut.view import *
 
+#this is an old version needs to be updated
+
 FPS = 24
 
 def getData(location):
