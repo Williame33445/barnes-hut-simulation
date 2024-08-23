@@ -27,31 +27,15 @@ class Simulator:
     def netAccelerationOf(self,particle):
         return self.rootNode.netAccelerationOf(particle)
 
-    #finds the accelerations of all the particles and then applies them
-    def applyAcceleration(self,timeElapsed):
-        def allAccelerations():
-            result = []
-            for p in self.particles:
-                result.append(self.netAccelerationOf(p))
-            return result
-
-        accelerations = allAccelerations()
-        for x in range(len(self.particles)):
-            acceleration = accelerations[x]
-            deltaVelocity = acceleration*timeElapsed
-            self.particles[x].velocity += deltaVelocity
-        
-    #applies the velocity to change the position
-    def applyVelocity(self,timeElapsed):
-        for p in self.particles:
-            deltaPosition = p.velocity*timeElapsed
-            p.pos += deltaPosition
-
     #cycles through rebuilding the tree and applying the velocities
     def tick(self,timeElapsed):
         self.buildTree()
-        self.applyVelocity(timeElapsed)
-        self.applyAcceleration(timeElapsed) #think this may be wrong
+        currentAccelerations = [self.netAccelerationOf(p) for p in self.particles]
+        currentVelocities = [p.velocity for p in self.particles]
+        for i in range(len(self.particles)): #i=j could be done better (just set to 0 here)
+            self.particles[i].pos += currentVelocities[i]*timeElapsed 
+            self.particles[i].velocity += currentAccelerations[i]*timeElapsed
+
 
 #Class the controls how long the program runs for
 class SimulationParams:

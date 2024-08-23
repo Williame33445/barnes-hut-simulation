@@ -10,7 +10,7 @@ from barneshut.tree import *
 from barneshut.particle import *
 from barneshut.simulator import *
 from barneshut.view import *
-from cv2 import VideoWriter, VideoWriter_fourcc
+from cv2 import VideoWriter
 
 """Listeners are required so the user can run the program with both settings at the same time, while not having to 
 run it literally twice. The functions of simulation listener are defined as the functions that are called differently
@@ -80,7 +80,7 @@ class SimulateToFile(SimulationListener):
         self.fileName = fileName
         self.FPS = FPS
     def setUp(self):
-        fourcc = VideoWriter_fourcc(*'mp4v')
+        fourcc = VideoWriter.fourcc(*'mp4v')
         self.video = VideoWriter(self.fileName, fourcc, self.FPS, (500, 500))
     def onTick(self,currentView):
         self.video.write(currentView)

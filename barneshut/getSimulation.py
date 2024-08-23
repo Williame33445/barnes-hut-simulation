@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.abspath("."))
 
-from barneshut.simulationCommand import *
+from barneshut.simulationController import *
 from barneshut.tree import *
 from barneshut.particle import *
 from barneshut.simulator import *

@@ -2,10 +2,10 @@ import numpy as np
 import itertools
 import csv
 import sys
-import os
+import os   
 import matplotlib.pyplot as plt
 
-w = np.array([0,0,0.75])
+w = np.array([0,0,1])
 a = 2.5
 b = 1.5
 
