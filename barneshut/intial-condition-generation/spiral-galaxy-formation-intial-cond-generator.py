@@ -1,15 +1,19 @@
 import numpy as np
 import itertools
 import csv
-import sys
-import os   
 import matplotlib.pyplot as plt
+
+"""
+Code to generate inital conditions for a spiral galaxy. Inital conditions are taken from: 
+PARTICLE SIMULATION OF SPIRAL GALAXY EVOLUTION by D. Greenspan. For a simple implementation see:
+https://github.com/Williame33445/physics-projects/blob/main/spiral-galaxy-evolution/spiral-galaxy-evolution.ipynb
+"""
 
 w = np.array([0,0,1])
 a = 2.5
 b = 1.5
 
-fileName = "C:\workspace\git-repos\\barnes-hut-simulation\\barneshut\data\spiral-galaxy\particles.csv" #generate particle directly in directory?
+fileName = "C:\workspace\git-repos\\barnes-hut-simulation\\barneshut\data\spiral-galaxy\particles.csv"
 
 ellipse = []
 with open(fileName,"w",newline="") as csvfile:
