@@ -1,6 +1,10 @@
 - error handling
 - if you are trying to write to a file and you end the program before the tick time is up, the mp4 will not run
-
+- README needs to be updated
+- getSimultation() needs to be updated
+- different force laws should be added to GUI
+- needs a general tidy up and look at efficiency of some of the code
+- upgrade integrator
 
 Future enhancements
 - Ability to label particles
